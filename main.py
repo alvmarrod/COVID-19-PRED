@@ -4,7 +4,8 @@ import pandas as pd
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-import get_population_density as popden
+from popden_feature import get_locations_df, latest_locations_with_popden
+from poprisk_feature import generate_poprisk_feature
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -46,21 +47,31 @@ def draw_aggr(df, grp_col, data_col):
 
 if __name__ == "__main__":
 
+  # 0. Generate features
+
+  # Population Risk
+  poprisk_weighted_file = "./data/raw/poprisk/poprisk_weighted.csv"
+  poprisk_class_output_png = "./data/features/poprisk/poprisk_features.png"
+  poprisk_class_output_csv = "./data/features/poprisk/poprisk_features.csv"
+  generate_poprisk_feature(poprisk_weighted_file,
+                           output_png=poprisk_class_output_png,
+                           output_csv=poprisk_class_output_csv)
+
   # 1. Get population density values by executing our script
   # pbar.set_description(desc="Removing unnecesary fields...", refresh=True)
-  location_popden = popden.latest_locations_with_popden()
+  location_popden = latest_locations_with_popden()
   # pbar.update(n=1)
 
   # Load data from file
-  df = pd.read_csv(r'.\data\01-22-2020.csv', header='infer')
+  # df = pd.read_csv(r'.\data\01-22-2020.csv', header='infer')
 
   # Replace NaN values for 0
-  for j in range(3,6):
-    df[covid_columns[j]].fillna(0, inplace=True)
+  # for j in range(3,6):
+  #   df[covid_columns[j]].fillna(0, inplace=True)
 
   # print(df)
-  from IPython import embed
-  embed()
+  # from IPython import embed
+  # embed()
 
   # Draw our data series
-  draw_aggr(df, covid_columns[1], covid_columns[3])
+  # draw_aggr(df, covid_columns[1], covid_columns[3])

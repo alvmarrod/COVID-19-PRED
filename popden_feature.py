@@ -1,114 +1,119 @@
-"""This script takes the data about Population Risk Weighted and classifies it
-in low (1), medium (2) or high (3) risk by applying a K-Means algorithm.
-"""
-
 import numpy as np
 import pandas as pd
 
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
+from classes.github_parser import github_parser
 
-from classes.csvhandler import df_to_csv, read_csv_as_df
+import requests
+from io import StringIO
 
-def sort_cluster_arrays(arrays):
-  """Calculates for the given array which is their natural order:
-  minimum values < ... < maxium values
+# Column order imposed by the data source of the COVID-19
+covid_columns = ["Province/State", 
+                 "Country/Region", 
+                 "Last Update", 
+                 "Confirmed", 
+                 "Deaths", 
+                 "Recovered"]
 
-  Returns the given array sorted like this
+covid_data_folder= r"https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports"
+
+date_format = r'%m-%d-%Y'
+
+covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
+
+population_csv_columns = ["Rank",
+                          "name",
+                          "pop2019",
+                          "pop2018",
+                          "GrowthRate",
+                          "area",
+                          "Density"]
+
+def write_to_csv(file, df):
+  df.to_csv(file, index=False)
+
+def parse_github_folder(url):
+  """Parses the github folder passed by URL and returns the latest file name
   """
-  output = arrays
 
-  for i in range(0, len(output)):
-    for j in range(i+1, len(output)):
-      if min(output[j]) < min(output[i]):
-        output[i], output[j] = output[j], output[i]
+  r = requests.get(url, auth=('', ''))
+  html = r.text
 
-  return output
+  # Parse it and check the latest file by it's name
+  parser = github_parser()
+  parser.feed(html)
 
-def calculate_frontiers(clusters):
-  """Calculates the frontiers between the clusters
+  return parser.latest_file
 
-  Returns two float values specifying these frontiers
+def get_locations_df(url):
+  """Returns a pd.Dataframe with the Countries from the file
+  specified by the given URL
   """
-  frontier_1 = (min(clusters[1]) + max(clusters[0])) / 2
-  frontier_2 = (min(clusters[2]) + max(clusters[1])) / 2
 
-  return frontier_1, frontier_2
+  # Get the file from the URL
+  r = requests.get(url, auth=('', ''))
+  html = r.text
+
+  # Read it to a pd.dataframe
+  df = pd.read_csv(StringIO(html), header='infer')
+
+  # Country is the column 1
+  cols = [covid_columns[1]]
+
+  return df[cols]
+
+def csv_as_df(file):
+
+  df = pd.read_csv(file, sep=',', header='infer')
+  return df
+
+def add_population_data(df):
+  """Enrichs the given pd.Dataframe with population and population density that
+  can be retrieved from the Population CSV
+  """
+
+  # Load the data from Population CSV
+  population_df = csv_as_df(r'.\data\raw\popden\popden.csv')
+
+  # Clean the population DF and leave only Name, Pop2019 and Density
+  
+  population_df = population_df[[
+    population_csv_columns[1],
+    population_csv_columns[2],
+    population_csv_columns[6]
+  ]]
+
+  # Rename Name column to match covid dataframe for merge
+  df.rename(columns={
+    covid_columns[1]: "Country"
+  }, inplace=True)
+
+  population_df.rename(columns={
+    population_csv_columns[1]: "Country",
+    population_csv_columns[2]: "Population",
+    }, inplace=True)
+  
+
+  df = pd.merge(df, population_df, on="Country", how='inner').drop_duplicates()
+
+  # print(df["Population"][df["Country"]=="Pakistan"])
+  return df
+
+def latest_locations_with_popden():
+
+  # Look for the latest available file in the repo
+  latest_covid_file_url = parse_github_folder(covid_data_folder)
+
+  download_url = covid_raw_base_url + "/" + latest_covid_file_url.strftime(date_format + ".csv")
+  covid_locations = get_locations_df(download_url)
+
+  # print("Recovering population data per country...")
+  covid_locations = add_population_data(covid_locations)
+
+  return covid_locations
 
 if __name__ == "__main__":
 
-  # Data
-  pop_risk_weighted_file = "./data/features/poprisk/pop_risk_weighted.csv"
+  covid_locations = latest_locations_with_popden()
 
-  # Read weighted risk
-  pop_risk_weighted_df = read_csv_as_df(pop_risk_weighted_file)
-
-  # Convert the dataframe to an array
-  pop_risk_weighted_df["Weighted Risk"].replace(0, 0.5, inplace=True)
-  prw_array = pop_risk_weighted_df["Weighted Risk"].to_numpy(dtype=float)
-
-  data_2_feed = np.array(
-    [[pop_risk_weighted_df["Weighted Risk"][i], 0] for i in range(0, len(prw_array))]
-  )
-
-  #  Apply K-Means with K=3
-  K = 3
-  kmeans = KMeans(n_clusters=K, random_state=0).fit(data_2_feed)
-
-  # Plot the results
-
-  # from IPython import embed
-  # embed()
-
-  # Draw it
-  fig = plt.figure()
-
-  # Separate in the three clusters
-  cluster_1 = [data_2_feed[i][0] for i in range(0, len(data_2_feed)) if kmeans.labels_[i] == 0]
-  cluster_2 = [data_2_feed[i][0] for i in range(0, len(data_2_feed)) if kmeans.labels_[i] == 1]
-  cluster_3 = [data_2_feed[i][0] for i in range(0, len(data_2_feed)) if kmeans.labels_[i] == 2]
-
-  # from IPython import embed
-  # embed()
-
-  # Know which one are the low and which one are the high risk
-  cluster_1, cluster_2, cluster_3 = sort_cluster_arrays([cluster_1, cluster_2, cluster_3])
-
-  # Continue plotting
-  y_1 = np.zeros(len(cluster_1))
-  y_2 = np.zeros(len(cluster_2))
-  y_3 = np.zeros(len(cluster_3))
-
-  plt_clu_1 = plt.scatter(cluster_1, y_1, c='b', marker='x')
-  plt_clu_2 = plt.scatter(cluster_2, y_2, c='g', marker='x')
-  plt_clu_3 = plt.scatter(cluster_3, y_3, c='r', marker='x')
-
-  # Put the boundaries of each cluster
-  frontier_1, frontier_2 = calculate_frontiers([cluster_1, cluster_2, cluster_3])
-  plt_frontier_1 = plt.axvline(x=frontier_1, c='r', ls='-.')
-  plt_frontier_2 = plt.axvline(x=frontier_2, c='c', ls='--')
-
-  # plt.xticks(x, labels, rotation='vertical')
-  # Put the legend
-  plt.legend((plt_clu_1, 
-              plt_clu_2, 
-              plt_clu_3, 
-              plt_frontier_1, 
-              plt_frontier_2),
-             ("Low Risk", 
-              "Medium Risk", 
-              "High Risk", 
-              f"Frontier 1 - {frontier_1}", 
-              f"Frontier 2 - {frontier_2}"))
-
-  # Put the title
-  plt.title("Population Risk Feature - Clustering by K-Means")
-
-  # Apply grid and x wide
-  plt.xlim(0, 1)
-  plt.grid()
-  # Show it
-  # plt.show()
-
-  fig.savefig('./data/features/poprisk/pop_risk_features.png')
+  # Save the data to a file.
+  write_to_csv("./data/features/popden/popden.csv", covid_locations)

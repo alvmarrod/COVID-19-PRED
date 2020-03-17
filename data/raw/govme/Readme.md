@@ -29,7 +29,7 @@ It is hard to classify where all the information has been found, so let us expla
 15. [Switzerland](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Switzerland)
 16. [Georgia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Georgia_(country))
 17. [Kuwait](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Kuwait)
-18. 
+18. [North Macedonia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_North_Macedonia)
 19. 
 20. 
 21. 
