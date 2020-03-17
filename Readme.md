@@ -10,11 +10,9 @@ This repo aims to do an analysis on COVID-19 spreading patterns based on worldwi
 
 3. As `temperature` data, we're fetching the data from ...
 
-4. As `governments countermeasures` data, we've collected them from the following sources. Since this is the most subjective part, there has not been any data transformation, but directly features that will be in the next section.
+4. As `population risk` we have collected the information that we can find regarding the presence of `ACE2` cells in the human body depending of the population. Please refer to the [Medium story]() for more info about it, and find the raw information in the `Weighted Risk CSV` in the [Raw Population Risk Folder](https://github.com/alvmarrod/COVID-19-PRED/tree/master/data/raw/poprisk).
 
-* [Japan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Japan)
-* [United Kingdom](https://www.telegraph.co.uk/politics/2020/03/16/uks-coronavirus-lockdown-has-already-begun-unofficially-northern/)
-* [Finland](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Finland)
+5. As `governments countermeasures` data, we've collected them from different sources. Since this is the most subjective part, there has not been any data transformation, but directly features that will be in the next section. Please, find it in this [separate readme](./data/raw/govme/Readme.md), due to the large number of countries.
 
 ## Features - Model Data
 
@@ -24,7 +22,9 @@ This repo aims to do an analysis on COVID-19 spreading patterns based on worldwi
 
 3. ...
 
-4. The `governments measures` that we have collected and directly put into a feature, under our own criteria (that you can find in our Medium article), has been placed directly in the [Features Governments Measures Folder](./data/features/govme/).
+4. The `weighted population risk` that we have calculated has been processed as well and saved from [Raw Population Risk Folder](https://github.com/alvmarrod/COVID-19-PRED/tree/master/data/raw/poprisk) into the [Features Population Risk Folder](https://github.com/alvmarrod/COVID-19-PRED/tree/master/data/features/poprisk).
+
+5. The `governments measures` that we have collected and directly put into a feature, under our own criteria (that you can find in our [Medium story]()), has been placed directly in the [Features Governments Measures Folder](./data/features/govme/).
 
 ## Dependencies
 
@@ -32,3 +32,10 @@ This repo aims to do an analysis on COVID-19 spreading patterns based on worldwi
 * Numpy
 * Matplotlib
 * [tqdm](https://github.com/tqdm/tqdm)
+
+## Thanks to
+
+As you may find out going through the project, I would like to thanks to [Pablo G.](), whose effort in collecting needed data made it possible for the project to happen. Specifically:
+
+* The `Weighted Risk` that he has calculated as we specify in the [Medium story](), and that is available in [Raw Population Risk Folder](https://github.com/alvmarrod/COVID-19-PRED/tree/master/data/raw/poprisk).
+* The `Governments Measures` that you can find in [Gov. Measures Readme](./data/raw/govme/Readme.md)
