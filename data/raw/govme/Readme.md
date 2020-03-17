@@ -24,15 +24,33 @@ It is hard to classify where all the information has been found, so let us expla
 10. [Oman](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Oman)
 11. [Iraq](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Iraq)
 12. [Lebanon](https://www.timesofisrael.com/lebanon-announces-two-week-lockdown-over-coronavirus/)
-13. 
-14. 
-15. 
-16. 
-17. 
+13. [Ukraine](https://www.unian.info/economics/10915361-week-s-balance-ukraine-on-lockdown-central-bank-loosens-grip-and-cabinet-launches-war-against-mafia-in-urban-development.html)
+14. [Austria](https://metro.co.uk/2020/03/15/austria-bans-gatherings-five-people-major-lockdown-12401729/)
+15. [Switzerland](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Switzerland)
+16. [Georgia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Georgia_(country))
+17. [Kuwait](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Kuwait)
 18. 
 19. 
 20. 
 21. 
+22. 
+23. 
+24. 
+25. 
+26. 
+27. 
+28. 
+29. 
+30. 
+31. 
+32. 
+33. 
+34. 
+35. 
+36. 
+37. 
+38. 
+
 
 ## Sources nº 2 - 
 
