@@ -76,7 +76,7 @@ def add_population_data(df):
   """
 
   # Load the data from Population CSV
-  population_df = csv_as_df(r'.\data\population.csv')
+  population_df = csv_as_df(r'.\data\features\popden\popden.csv')
 
   # Clean the population DF and leave only Name, Pop2019 and Density
   
