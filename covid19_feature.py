@@ -2,6 +2,7 @@
 get it ready to be used as a feature for the models.
 """
 
+import os.path
 import numpy as np
 import pandas as pd
 
@@ -33,7 +34,7 @@ def gen_covid19_feat(covid19_dr_url,
 
   # Download
   for file in covid_url_list:
-    download_as_csv(file[1], file[0])
+    if not os.path.isfile(file[0]):
+      download_as_csv(file[1], file[0])
 
   # 2. Create an unique CSV with an unique dataframe
-  

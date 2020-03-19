@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
-from classes.csvhandler import (df_to_csv, read_csv_as_df)
+from classes.csv_handler import (df_to_csv, read_csv_as_df)
 
 def _sort_cluster_arrays(arrays):
   """Calculates for the given array which is their natural order:
