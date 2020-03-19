@@ -4,8 +4,10 @@ import pandas as pd
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from popden_feature import get_locations_df, latest_locations_with_popden
-from poprisk_feature import generate_poprisk_feature
+from covid19_feature import gen_covid19_feat
+from poprisk_feature import gen_poprisk_feat
+
+# from popden_feature import get_locations_df, latest_locations_with_popden
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -49,17 +51,57 @@ if __name__ == "__main__":
 
   # 0. Generate features
 
+  # COVID-19
+  covid19_repo_url = r"https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports"
+  covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
+  covid19_raw_folder = "./data/raw/covid/"
+  covid19_feat_file = "./data/features/covid/covid.csv"
+  #gen_covid19_feat(covid19_repo_url,
+  #                 covid_raw_base_url,
+  #                 output_raw=covid19_raw_folder,
+  #                 output_csv=covid19_feat_file)
+
+  # Population Density
+  popden_raw_file = "./data/raw/popden/popden.csv"
+  popden_feat_csv = "./data/features/popden/popden.csv"
+  # gen_popden_feat(popden_raw_file,
+  #                output_csv=popden_feat_csv)
+
+  # Mean Age
+  meanage_raw_file = "./data/raw/meanage/meanage.csv"
+  meanage_feat_csv = "./data/features/meanage/meanage.csv"
+  # gen_meanage_feat(meanage_raw_file,
+  #                 output_csv=meanage_feat_csv)
+
+  # Mean Temperature
+  temp_raw_file = "./data/raw/temp/temp.csv"
+  temp_feat_csv = "./data/features/temp/temp.csv"
+  # gen_temp_feat(temp_raw_file,
+  #              output_csv=temp_feat_csv)
+
   # Population Risk
-  poprisk_weighted_file = "./data/raw/poprisk/poprisk_weighted.csv"
-  poprisk_class_output_png = "./data/features/poprisk/poprisk_features.png"
-  poprisk_class_output_csv = "./data/features/poprisk/poprisk_features.csv"
-  generate_poprisk_feature(poprisk_weighted_file,
-                           output_png=poprisk_class_output_png,
-                           output_csv=poprisk_class_output_csv)
+  poprisk_raw_file = "./data/raw/poprisk/poprisk.csv"
+  poprisk_feat_png = "./data/features/poprisk/poprisk.png"
+  poprisk_feat_csv = "./data/features/poprisk/poprisk.csv"
+  gen_poprisk_feat(poprisk_raw_file,
+                  output_png=poprisk_feat_png,
+                  output_csv=poprisk_feat_csv)
+
+  # Gov. Measures 1 - Lockdown
+  lockdown_raw_file = "./data/raw/govme/lockdown.csv"
+  lockdown_feat_csv = "./data/features/govme/lockdown.csv"
+  # gen_lockdown_feat(lockdown_raw_file,
+  #                 output_csv=lockdown_feat_csv)
+
+  # Gov. Measures 2 - Borders Closed
+  borcls_raw_file = "./data/raw/govme/borcls.csv"
+  borcls_feat_csv = "./data/features/govme/borcls.csv"
+  # gen_borcls_feat(lockdown_raw_file,
+  #                output_csv=lockdown_feat_csv)
 
   # 1. Get population density values by executing our script
   # pbar.set_description(desc="Removing unnecesary fields...", refresh=True)
-  location_popden = latest_locations_with_popden()
+  ###### location_popden = latest_locations_with_popden()
   # pbar.update(n=1)
 
   # Load data from file

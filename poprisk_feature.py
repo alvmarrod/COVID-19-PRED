@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
-from classes.csvhandler import df_to_csv, read_csv_as_df
+from classes.csvhandler import (df_to_csv, read_csv_as_df)
 
 def _sort_cluster_arrays(arrays):
   """Calculates for the given array which is their natural order:
@@ -35,9 +35,9 @@ def _calculate_frontiers(clusters):
 
   return frontier_1, frontier_2
 
-def generate_poprisk_feature(poprisk_weighted_file,
-                             output_png="./poprisk.png",
-                             output_csv="./poprisk.csv"):
+def gen_poprisk_feat(poprisk_weighted_file,
+                      output_png="./poprisk.png",
+                      output_csv="./poprisk.csv"):
 
   # Read weighted risk
   pop_risk_weighted_df = read_csv_as_df(poprisk_weighted_file)

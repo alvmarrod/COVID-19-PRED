@@ -19,6 +19,8 @@ class github_parser(HTMLParser):
   structure = [0, 0, 0]
   latest_file = dt.datetime.strptime("01-01-1990", date_format)
 
+  files_dict = []
+
   def handle_starttag(self, tag, attrs):
     if (tag == "td") and (self.structure[0] == 0):
       for attr in attrs:
@@ -51,3 +53,6 @@ class github_parser(HTMLParser):
           # Keep it
           self.latest_file = dt.datetime.strptime(file_name, self.date_format)
           # print(file_name)
+
+        # 3. All files must be kept in the total dictionary
+        self.files_dict.append(file_name)

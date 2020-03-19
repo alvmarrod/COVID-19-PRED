@@ -1,7 +1,11 @@
+"""This script takes the data about Population Density and gets it ready to be
+used as a feature for the models.
+"""
+
 import numpy as np
 import pandas as pd
 
-from classes.github_parser import github_parser
+from .classes.github_parser import github_parser
 
 import requests
 from io import StringIO
