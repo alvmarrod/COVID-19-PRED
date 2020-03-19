@@ -84,8 +84,8 @@ if __name__ == "__main__":
   poprisk_feat_png = "./data/features/poprisk/poprisk.png"
   poprisk_feat_csv = "./data/features/poprisk/poprisk.csv"
   gen_poprisk_feat(poprisk_raw_file,
-                  output_png=poprisk_feat_png,
-                  output_csv=poprisk_feat_csv)
+                   output_png=poprisk_feat_png,
+                   output_csv=poprisk_feat_csv)
 
   # Gov. Measures 1 - Lockdown
   lockdown_raw_file = "./data/raw/govme/lockdown.csv"

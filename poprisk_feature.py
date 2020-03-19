@@ -36,8 +36,8 @@ def _calculate_frontiers(clusters):
   return frontier_1, frontier_2
 
 def gen_poprisk_feat(poprisk_weighted_file,
-                      output_png="./poprisk.png",
-                      output_csv="./poprisk.csv"):
+                     output_png="./poprisk.png",
+                     output_csv="./poprisk.csv"):
 
   # Read weighted risk
   pop_risk_weighted_df = read_csv_as_df(poprisk_weighted_file)
@@ -110,3 +110,22 @@ def gen_poprisk_feat(poprisk_weighted_file,
   # plt.show()
 
   fig.savefig(output_png)
+
+  # Generate the CSV output with the classification
+
+  # Work with the original dataframe
+  class_df = pop_risk_weighted_df.copy(deep=False)
+
+  # Don't need the all columns
+  class_df = class_df[["Country", "Weighted Risk"]]
+
+  # Generate new classification
+  class_df["Classification"] = [3 if risk >= frontier_2 else \
+                                2 if risk >= frontier_1 else \
+                                1 for risk in class_df["Weighted Risk"]]
+  
+  # Drop the Weighted Risk
+  class_df = class_df[["Country", "Classification"]]
+
+  # Save to CSV file
+  df_to_csv(output_csv, class_df)
