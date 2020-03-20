@@ -30,26 +30,47 @@ It is hard to classify where all the information has been found, so let us expla
 16. [Georgia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Georgia_(country))
 17. [Kuwait](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Kuwait)
 18. [North Macedonia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_North_Macedonia)
-19. 
-20. 
-21. 
-22. 
-23. 
-24. 
-25. 
-26. 
-27. 
-28. 
-29. 
-30. 
-31. 
-32. 
-33. 
-34. 
-35. 
-36. 
-37. 
-38. 
+19. [Greece](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Greece#cite_note-:2-19)
+20. [Sweden](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Sweden)
+21. [Norway](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Norway)
+22. [Bahrain](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Bahrain)
+23. [Estonia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Estonia)
+24. [Denmark](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Denmark)
+25. [Netherlands](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Netherlands)
+26. [Lithuania](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Lithuania)
+27. [New Zealand](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_New_Zealand)
+28. [Belarus](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Belarus)
+29. [Armenia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Armenia)
+30. [Iran](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Iran)
+31. [Israel](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Israel)
+32. [Czech Republic](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Czech_Republic#Policies_to_fight_the_contagion)
+33. [Qatar](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Qatar)
+34. [Singapore](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Singapore)
+35. [South Korea](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_South_Korea)
+36. [Latvia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Latvia)
+37. [Portugal](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Portugal)
+38. [Andorra](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Andorra)
+39. [Belgium](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Belgium)
+40. [Poland](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Poland)
+41. [Hungary](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Hungary#Declaration_of_nationwide_state_of_emergency)
+42. [Slovenia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Slovenia)
+43. [Saudi Arabia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Saudi_Arabia)
+44. [Bhutan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Bhutan)
+45. [Malaysia](https://www.malaymail.com/news/malaysia/2020/03/13/pm-mass-gatherings-including-religious-events-to-be-cancelled-or-postponed/1846319)
+46. [Serbia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Serbia)
+47. [Romania](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Romania)
+48. [Brunei](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Brunei)
+49. [Malta](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malta)
+50. [Moldova](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Moldova)
+51. [Maldives](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Maldives)
+52. [Bulgaria](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Bulgaria)
+53. [Tunisia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Tunisia)
+54. [Northern Cyprus](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Northern_Cyprus)
+55. [Mongolia](https://montsame.mn/en/read/218344)
+56. [Afghanistan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Afghanistan)
+57. [Monaco](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Monaco)
+58. [Taiwan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Taiwan)
+
 
 
 ## Sources nº 2 - 
