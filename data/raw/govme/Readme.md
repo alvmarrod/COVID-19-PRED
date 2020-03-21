@@ -70,6 +70,29 @@ It is hard to classify where all the information has been found, so let us expla
 56. [Afghanistan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Afghanistan)
 57. [Monaco](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Monaco)
 58. [Taiwan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Taiwan)
+59. [China](https://en.wikipedia.org/wiki/2019%E2%80%9320_coronavirus_pandemic_in_mainland_China)
+60. [Vietnam](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Vietnam)
+61. [Russia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Russia)
+62. [India](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_India)
+63. [Jordan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Jordan)
+64. [United Arab Emirates](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_United_Arab_Emirates)
+65. [Egypt](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Egypt)
+66. [Kenya](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Kenya)
+67. [Morocco](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Morocco)
+68. [Sudan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Sudan)
+69. [Argentina](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Argentina)
+70. 
+71. 
+72. 
+73. 
+74. 
+75. 
+76. 
+77. 
+78. 
+79. 
+80. 
+
 
 
 
