@@ -56,10 +56,10 @@ if __name__ == "__main__":
   covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
   covid19_raw_folder = "./data/raw/covid/"
   covid19_feat_file = "./data/features/covid/covid.csv"
-  #gen_covid19_feat(covid19_repo_url,
-  #                 covid_raw_base_url,
-  #                 output_raw=covid19_raw_folder,
-  #                 output_csv=covid19_feat_file)
+  gen_covid19_feat(covid19_repo_url,
+                   covid_raw_base_url,
+                   output_raw=covid19_raw_folder,
+                   output_csv=covid19_feat_file)
 
   # Population Density
   popden_raw_file = "./data/raw/popden/popden.csv"
@@ -79,13 +79,13 @@ if __name__ == "__main__":
   # gen_temp_feat(temp_raw_file,
   #              output_csv=temp_feat_csv)
 
-  # Population Risk
+  # Population Risk - DONE
   poprisk_raw_file = "./data/raw/poprisk/poprisk.csv"
   poprisk_feat_png = "./data/features/poprisk/poprisk.png"
   poprisk_feat_csv = "./data/features/poprisk/poprisk.csv"
-  gen_poprisk_feat(poprisk_raw_file,
-                   output_png=poprisk_feat_png,
-                   output_csv=poprisk_feat_csv)
+  #gen_poprisk_feat(poprisk_raw_file,
+  #                 output_png=poprisk_feat_png,
+  #                 output_csv=poprisk_feat_csv)
 
   # Gov. Measures 1 - Lockdown
   lockdown_raw_file = "./data/raw/govme/lockdown.csv"
