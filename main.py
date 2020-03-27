@@ -52,14 +52,14 @@ if __name__ == "__main__":
   # 0. Generate features
 
   # COVID-19
-  covid19_repo_url = r"https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports"
-  covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
+  covid19_repo_url = r"https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series"
+  covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series"
   covid19_raw_folder = "./data/raw/covid/"
-  covid19_feat_file = "./data/features/covid/covid.csv"
-  gen_covid19_feat(covid19_repo_url,
-                   covid_raw_base_url,
-                   output_raw=covid19_raw_folder,
-                   output_csv=covid19_feat_file)
+  covid19_feat_folder = "./data/features/covid/"
+  confirmed, deaths, recovered = gen_covid19_feat(covid19_repo_url,
+                                                  covid_raw_base_url,
+                                                  output_raw=covid19_raw_folder,
+                                                  output_csv=covid19_feat_folder)
 
   # Population Density
   popden_raw_file = "./data/raw/popden/popden.csv"

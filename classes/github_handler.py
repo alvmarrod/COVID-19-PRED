@@ -26,21 +26,6 @@ def get_files_from_github_folder(url):
 
   return parser.files_dict
 
-def get_latest_file_github_folder(url):
-  """Parses the github folder passed by URL and returns the latest file name,
-  using the file names as date indicators.
-  """
-
-  r = requests.get(url, auth=('', ''))
-  html = r.text
-
-  # Parse it and check the latest file by it's name
-  parser = github_parser()
-  parser.feed(html)
-
-  return parser.latest_file
-
-
 def download_as_csv(url, target_file=""):  
   """Download the file from the specified URL and stores it in the
   target file name and path

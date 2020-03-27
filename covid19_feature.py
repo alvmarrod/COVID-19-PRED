@@ -19,118 +19,46 @@ date_format = r'%m-%d-%Y'
 # Columns from source - Avoid Latitude and Longitude
 covid_columns = ["Province/State", 
                  "Country/Region", 
-                 "Last Update", 
-                 "Confirmed", 
-                 "Deaths", 
-                 "Recovered"]
+                 "Lat",
+                 "Long"]
 
-def _gen_cases_df(countries, dates, dfs_dict, case):
-  """Generates the cases dataframe for a specific case type
-
-  Outputs
-  -----
-  A dataframe where columns are dates, rows are countries and cells are cases
-  number
-  """
-
-  # Create empty df
-  out_df = pd.DataFrame(columns=dates, index=countries)
-  out_df.fillna(0, inplace=True)
-
-  # Query and insert the data from each dataframe
-  print(f"++ Inserting {case} ++")
-  for date in dates:
-
-    # Name of the dataframe
-    df_name = date + ".csv"
-
-    # Take the dataframe from this day
-    day_df = dfs_dict[df_name]
-    date_loc = out_df.columns.get_loc(date)
-
-    # Insert the data from this this day into the output dataframe
-    # One value per country (existing in the df)
-    match = 0
-    no_match = 0
-    
-    # print(f"Insering date {date}")
-    for country in day_df.index.to_numpy(dtype=str):
-      try:
-        if country in out_df.index:
-          # print(f"Insert country {country} value {day_df[day_df.index == country][case][0]}")
-          # out_df[out_df.index == country][date] = day_df[day_df.index == country][case][0]
-          out_df.loc[out_df.index == country, date_loc] = day_df[day_df.index == country][case][0]
-          match += 1
-        else:
-          no_match += 1
-          print(f"Have to map: {country}")
-          # print(f"Latest list: {out_df.index["Hong" in out_df.index]}")
-          for pais in out_df.index:
-            if "Hong" in pais:
-              print(pais)
-          input()
-      except Exception as e:
-        print("Exception: " + str(e))
-
-    print(f"Matches: {match}\t-\tNo match: {no_match}")
-
-    # print(day_df)
-
-  print(out_df)
-
-  return out_df
-
-def _read_all_covid_raw(folder):
-  """Read all the CSV files that it can found in a folder, and returns the
-  composed dataframes for each kind of case, altogether in a dictionary
+def _read_covid_raw(folder, type):
+  """Read the COVID raw data from the CSV specified by the type parameter, and
+  returns the feature dataframe ready to use by the model
   """
 
   # Get CSV raw files
   files = glob.glob(folder + "/*.csv")
-  dates = []
+  raw_df = None
 
-  # Read each one of them in a Pandas Dataframe
-  raw_df_dic = {}
-  latest_file = ""
+  # Load the specified one
   for file in files:
-    try:
-      name = file.split("\\")[-1]
-      raw_df_dic[name] = read_csv_as_df(file)[covid_columns]
-      cols_to_save = [ col for col in covid_columns if "Province" not in col ]
-      raw_df_dic[name] = raw_df_dic[name][cols_to_save]
-      raw_df_dic[name] = raw_df_dic[name].groupby([covid_columns[1]],
-                                                  as_index=False).sum()
-      raw_df_dic[name].set_index(covid_columns[1], inplace= True)
-      # print(raw_df_dic[name])
-      # print(raw_df_dic[name][ raw_df_dic[name].index == "Mainland China" ])
+    if type in file:
+      raw_df = read_csv_as_df(file)
 
-      latest_file = name
-      dates.append(name.split(".")[0])
-    except Exception as e:
-      print(f"Error when processing file: {name}")
-      print(str(e))
+  if raw_df is None:
+    raise Exception(f"Type {type} not found in raw data")
 
-  # Identify how many countries there are. For it, take the latest file
-  # countries = raw_df_dic[latest_file][covid_columns[1]].to_numpy(dtype=str)
-  countries = raw_df_dic[latest_file].index.to_numpy(dtype=str)
-  # amount = len(countries)
+  # Remove unnecesary columns
+  remove = "cols"
+  axis = 1 if "cols" in remove else 0
+  raw_df = raw_df.drop(covid_columns[0], axis)
+  raw_df = raw_df.drop(covid_columns[2], axis)
+  raw_df = raw_df.drop(covid_columns[3], axis)
 
-  # Collect the data for each case type in its own dataframe
-  cases_df =  {}
-  for case in covid_columns[-3:]:
-    cases_df[case] = _gen_cases_df(countries, dates, raw_df_dic, case)
-    print(cases_df[case])
-    #print(cases_df[case].shape)
+  # Group by country
+  raw_df = raw_df.groupby(by=covid_columns[1], as_index=False).sum()
 
-  return cases_df
+  return raw_df
 
 def gen_covid19_feat(covid19_dr_url,
                      covid19_raw_url,
                      output_raw="./data/raw/covid/",
-                     output_csv="./data/features/covid/covid.csv"):
+                     output_csv="./data/features/covid"):
   """This function receives the URL from the repository where CSV with the
-  daily reports of the COVID-19 are stored. Then it downloads them all into the
-  specified as RAW folder, and creates an unique CSV as feature output.
+  time series reports of the COVID-19 are stored. Then it downloads them all
+  into the specified as RAW folder, and creates their respective CSV in the
+  features folder but with all data grouped by country.
   """
 
   # 1. Get the files and save them to Raw data folder
@@ -145,14 +73,28 @@ def gen_covid19_feat(covid19_dr_url,
 
   # Download
   for file in covid_url_list:
-    if not os.path.isfile(file[0]):
-      download_as_csv(file[1], file[0])
+    # If exist, delete the old version so we can have the latest
+    if os.path.isfile(file[0]):
+      os.remove(file[0])
 
-  # 2. Create an unique CSV per case with an unique dataframe
-  # Confirmed Cases CSV - Row per Country, Column per day
-  # Deaths Cases CSV - Row per Country, Column per day
-  # Recovered Cases CSV - Row per Country, Column per day
+    # Download it
+    download_as_csv(file[1], file[0])
 
-  # Load all files each one in a dataframe
-  covid_raw_path = "./data/raw/covid/"
-  conf_cases_df, deaths_df, recov_df = _read_all_covid_raw(covid_raw_path)
+  # 2. Output the clean output dataframe with only usable data
+  types = ['confirmed', 'deaths', 'recovered']
+  results = []
+  
+  for case_type in types:
+
+    case_df = _read_covid_raw(output_raw, case_type)
+    results.append(case_df)
+
+    output_file = output_csv + f"/{case_type}.csv"
+
+    # 3. Write to features folder
+    if os.path.isfile(output_file):
+      os.remove(output_file)
+
+    df_to_csv(output_file, case_df)
+
+  return results[0], results[1], results[2]

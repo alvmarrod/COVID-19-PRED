@@ -4,7 +4,7 @@ we desire to load/save their data into/from Pandas Dataframes
 
 import pandas as pd
 
-def df_to_csv(file, df):
+def df_to_csv(file, df, index=False):
   """Writes the provided dataframe to the specified file
   """
   df.to_csv(file, index=False)

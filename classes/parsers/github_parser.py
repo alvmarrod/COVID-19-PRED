@@ -13,11 +13,8 @@ class github_parser(HTMLParser):
         file_name.csv
   Where file_name has the format: MM-DD-YYYY.csv
   """
-  
-  date_format = r'%m-%d-%Y'
 
   structure = [0, 0, 0]
-  latest_file = dt.datetime.strptime("01-01-1990", date_format)
 
   files_dict = []
 
@@ -42,17 +39,10 @@ class github_parser(HTMLParser):
   def handle_data(self, data):
     if sum(self.structure) == 3:
       
-      # 1. Is the file a data file?
-      pattern = re.compile(r"^((0|1)\d{1})-((0|1|2)\d{1})-((19|20)\d{2})")
+      # Is the file a data file?
+      regex = r"(time_series_covid19_)(confirmed|deaths|recovered)(_global.csv)"
+      pattern = re.compile(regex)
+
       if pattern.match(data):
-
-        # 2. Is it newer than the latest recognized?
         file_name = data.split(".")[0]
-
-        if dt.datetime.strptime(file_name, self.date_format).date() > self.latest_file.date():
-          # Keep it
-          self.latest_file = dt.datetime.strptime(file_name, self.date_format)
-          # print(file_name)
-
-        # 3. All files must be kept in the total dictionary
         self.files_dict.append(file_name)
