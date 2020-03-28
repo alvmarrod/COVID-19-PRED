@@ -81,17 +81,50 @@ It is hard to classify where all the information has been found, so let us expla
 67. [Morocco](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Morocco)
 68. [Sudan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Sudan)
 69. [Argentina](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Argentina)
-70. 
-71. 
-72. 
-73. 
-74. 
-75. 
-76. 
-77. 
-78. 
-79. 
-80. 
+70. [Bolivia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Bolivia)
+71. [Brazil](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Brazil)
+72. [Costa Rica](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Costa_Rica)
+73. [Colombia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Colombia)
+74. [Cuba](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Cuba)
+75. [Dominican Republic](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Dominican_Republic)
+76. [Honduras](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Honduras)
+77. [Panama](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Panama)
+78. [Peru](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Peru)
+79. [United Kingdom](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_United_Kingdom)
+80. [United States](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_United_States)
+81. [Pakistan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Pakistan)
+82. [Barbados](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Barbados)
+83. [Nigeria](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Nigeria)
+84. [Puerto Rico](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Puerto_Rico)
+85. [Spain](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain)
+86. [Italy](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Italy)
+87. [Croatia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Croatia)
+88. [Burkina Faso](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Burkina_Faso)
+89. [Albania](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Albania)
+90. [Philippines](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Philippines)
+91. [Nepal](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Nepal)
+92. [Sri Lanka](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Sri_Lanka)
+93. [Thailand](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Thailand)
+94. [Cambodia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Cambodia)
+95. [Germany](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Germany)
+96. [Congo](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Democratic_Republic_of_the_Congo)
+97. [Algeria](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Algeria)
+98. [Reunion](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_R%C3%A9union)
+99. [Austria](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Austria)
+100. [Ireland](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Republic_of_Ireland)
+101. 
+102. 
+103. 
+104. 
+105. 
+106. 
+107. 
+108. 
+109. 
+110. 
+111. 
+
+
 
 
 
