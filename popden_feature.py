@@ -6,12 +6,11 @@ import os
 import numpy as np
 import pandas as pd
 
+from io import StringIO
 from sklearn.cluster import KMeans
 
 from classes.plt_handler import plot_clustering
 from classes.csv_handler import read_csv_as_df, df_to_csv
-
-from io import StringIO
 
 popden_raw_cols = ["Rank",
                    "name",
@@ -119,16 +118,16 @@ def gen_popden_feat(input_raw="./data/raw/popden/",
   draw_title = "Population Density Feature - Clustering by K-Means"
   output_png = output_folder + "/popden.png"
 
-  frontiers = plot_clustering(clusters, draw_title, output_png)
+  frontiers = plot_clustering(clusters, draw_title, "Density", output_png)
 
   # Now we generate the final classification. We take advantage from frontiers
   # calculated when plotting
   
   # Generate new classification
   col = popden_raw_cols[-1]
-  popden_feat_df["Classification"] = [3 if risk >= frontiers[1] else \
-                                      2 if risk >= frontiers[0] else \
-                                      1 for risk in popden_feat_df[col]]
+  popden_feat_df["Classification"] = [3 if density >= frontiers[1] else \
+                                      2 if density >= frontiers[0] else \
+                                      1 for density in popden_feat_df[col]]
   # We can drop density already
   remove = "cols"
   axis = 1 if "cols" in remove else 0

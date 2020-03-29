@@ -7,6 +7,23 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+def _sort_cluster_arrays(arrays):
+  """Calculates for the given array which is their natural order:
+  minimum values < ... < maxium values
+
+  Returns the given array sorted like this.
+
+  DEPRECATED. Was used before creating sorting cluster dictionary.
+  """
+  output = arrays
+
+  for i in range(0, len(output)):
+    for j in range(i+1, len(output)):
+      if min(output[j]) < min(output[i]):
+        output[i], output[j] = output[j], output[i]
+
+  return output
+
 def _sort_cluster_dict(dictionary):
   """Calculates for the given dictionary which is their natural order:
   minimum values < ... < maxium values
@@ -55,7 +72,11 @@ def _calculate_frontiers(clusters):
 
   return frontier_1, frontier_2
 
-def plot_clustering(clusters_received, title, output_png, plot=False):
+def plot_clustering(clusters_received, 
+                    title,
+                    legend_word,
+                    output_png,
+                    plot=False):
   """Plots the result of a clustering technique like K-Means.
 
   Expects clusters with K = 3 groups
@@ -111,9 +132,9 @@ def plot_clustering(clusters_received, title, output_png, plot=False):
 
   # Put the legend
   plt.legend(handles,
-             ("Low Risk", 
-              "Medium Risk", 
-              "High Risk", 
+             (f"Low {legend_word}", 
+              f"Medium {legend_word}", 
+              f"High {legend_word}", 
               f"Frontier 1 - {frontier_1}", 
               f"Frontier 2 - {frontier_2}"))
 
