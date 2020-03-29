@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 
 from covid19_feature import gen_covid19_feat
 from poprisk_feature import gen_poprisk_feat
-
-# from popden_feature import get_locations_df, latest_locations_with_popden
+from popden_feature import gen_popden_feat
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -63,9 +62,14 @@ if __name__ == "__main__":
 
   # Population Density
   popden_raw_file = "./data/raw/popden/popden.csv"
-  popden_feat_csv = "./data/features/popden/popden.csv"
-  # gen_popden_feat(popden_raw_file,
-  #                output_csv=popden_feat_csv)
+  popden_feat_folder = "./data/features/popden"
+  handicaps = {
+    "Australia": 3
+  }
+  gen_popden_feat(popden_raw_file,
+                  output_folder=popden_feat_folder,
+                  handicaps=handicaps,
+                  remove_over=True)
 
   # Mean Age
   meanage_raw_file = "./data/raw/meanage/meanage.csv"

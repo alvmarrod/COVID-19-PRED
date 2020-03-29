@@ -2,122 +2,147 @@
 used as a feature for the models.
 """
 
+import os
 import numpy as np
 import pandas as pd
 
-from .classes.github_parser import github_parser
+from sklearn.cluster import KMeans
 
-import requests
+from classes.plt_handler import plot_clustering
+from classes.csv_handler import read_csv_as_df, df_to_csv
+
 from io import StringIO
 
-# Column order imposed by the data source of the COVID-19
-covid_columns = ["Province/State", 
-                 "Country/Region", 
-                 "Last Update", 
-                 "Confirmed", 
-                 "Deaths", 
-                 "Recovered"]
+popden_raw_cols = ["Rank",
+                   "name",
+                   "pop2019",
+                   "pop2018",
+                   "GrowthRate",
+                   "area",
+                   "Density"]
 
-covid_data_folder= r"https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports"
-
-date_format = r'%m-%d-%Y'
-
-covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
-
-population_csv_columns = ["Rank",
-                          "name",
-                          "pop2019",
-                          "pop2018",
-                          "GrowthRate",
-                          "area",
-                          "Density"]
-
-def write_to_csv(file, df):
-  df.to_csv(file, index=False)
-
-def parse_github_folder(url):
-  """Parses the github folder passed by URL and returns the latest file name
+def _read_popden_raw(raw_csv, handicaps=None):
+  """Read the raw data from the CSV specified by the type parameter, and
+  returns the feature dataframe ready removing undesired columns. Results are
+  rounded to multiples of 5 and are applied a handicap.
   """
 
-  r = requests.get(url, auth=('', ''))
-  html = r.text
+  # Load the specified one
+  raw_df = read_csv_as_df(raw_csv)
 
-  # Parse it and check the latest file by it's name
-  parser = github_parser()
-  parser.feed(html)
+  if raw_df is None:
+    raise Exception(f"Raw data not found in file {raw_csv}")
 
-  return parser.latest_file
+  # Remove unnecesary columns
+  remove = "cols"
+  axis = 1 if "cols" in remove else 0
+  raw_df = raw_df.drop(popden_raw_cols[0], axis)
+  raw_df = raw_df.drop(popden_raw_cols[2], axis)
+  raw_df = raw_df.drop(popden_raw_cols[3], axis)
+  raw_df = raw_df.drop(popden_raw_cols[4], axis)
+  raw_df = raw_df.drop(popden_raw_cols[5], axis)
 
-def get_locations_df(url):
-  """Returns a pd.Dataframe with the Countries from the file
-  specified by the given URL
+  # Apply existing handicaps
+  name = popden_raw_cols[1]
+  col = popden_raw_cols[-1]
+  if not handicaps is None:
+    for k in handicaps:
+      indexes = raw_df[name][raw_df[name] == k].index.tolist()
+      for index in indexes:
+        raw_df.loc[index, col] = raw_df.loc[index, col] * handicaps[k]
+
+  # Make the results to be multiple of 5 and at least 5
+  if np.issubdtype(raw_df[col].dtype, np.number):
+    raw_df[col] = (raw_df[col] / 5).round() * 5
+    # Make sure it is at least 5 and not 0
+    raw_df[col] = raw_df[col] + (raw_df[col] == 0) * 5
+
+  return raw_df
+
+def _apply_classification(popden_df, K=3):
+  """Applies K-Means to the population density dataframe that is passed and
+  returns a dictionary with the clusters.
+
+  It also stores the output picture of the classification.
   """
 
-  # Get the file from the URL
-  r = requests.get(url, auth=('', ''))
-  html = r.text
+  # Convert the dataframe to an array
+  col = popden_raw_cols[-1]
+  popden_array = popden_df[col].to_numpy(dtype=float)
 
-  # Read it to a pd.dataframe
-  df = pd.read_csv(StringIO(html), header='infer')
+  data_2_feed = []
+  for k in popden_array:
+    data_2_feed.append([k, 0])
 
-  # Country is the column 1
-  cols = [covid_columns[1]]
+  # Apply K-Means
+  kmeans = KMeans(n_clusters=K, random_state=0).fit(data_2_feed)
 
-  return df[cols]
+  clusters = {}
+  for label in kmeans.labels_:
+    clusters[label] = \
+      [data_2_feed[i][0] for i in range(0, len(data_2_feed)) if kmeans.labels_[i] == label]
 
-def csv_as_df(file):
+  return clusters
 
-  df = pd.read_csv(file, sep=',', header='infer')
-  return df
 
-def add_population_data(df):
-  """Enrichs the given pd.Dataframe with population and population density that
-  can be retrieved from the Population CSV
+def gen_popden_feat(input_raw="./data/raw/popden/",
+                    output_folder="./data/features/popden",
+                    handicaps=None,
+                    remove_over=False):
+  """This function process the raw CSV file with all the world's population
+  density aand creates the output CSV file with the classification of each
+  country based on its poulation density.
+
+  It also allows to apply a specific correction factor to countries based on
+  a dictionary passed as argument.
   """
 
-  # Load the data from Population CSV
-  population_df = csv_as_df(r'.\data\raw\popden\popden.csv')
+  # 1. Get the data from the raw CSV file
+  # Results are already multiple of 5, we apply the handicaps
+  popden_raw_df = _read_popden_raw(input_raw, handicaps)
 
-  # Clean the population DF and leave only Name, Pop2019 and Density
+  # 3. Finally we apply the classification
+  if remove_over:
+    den = popden_raw_cols[-1]
+    name = popden_raw_cols[1]
+    indexes = popden_raw_df[popden_raw_df[den] < 10000][name].index.tolist()
+    classification_df = popden_raw_df.iloc[indexes]
+  else:
+    classification_df = popden_raw_df
+  clusters = _apply_classification(classification_df, K=3)
+
+  # Generate the CSV output with the classification
+  # Work with the original dataframe
+  popden_feat_df = popden_raw_df.copy(deep=False)
+
+  # Draw it
+  draw_title = "Population Density Feature - Clustering by K-Means"
+  output_png = output_folder + "/popden.png"
+
+  frontiers = plot_clustering(clusters, draw_title, output_png)
+
+  # Now we generate the final classification. We take advantage from frontiers
+  # calculated when plotting
   
-  population_df = population_df[[
-    population_csv_columns[1],
-    population_csv_columns[2],
-    population_csv_columns[6]
-  ]]
+  # Generate new classification
+  col = popden_raw_cols[-1]
+  popden_feat_df["Classification"] = [3 if risk >= frontiers[1] else \
+                                      2 if risk >= frontiers[0] else \
+                                      1 for risk in popden_feat_df[col]]
+  # We can drop density already
+  remove = "cols"
+  axis = 1 if "cols" in remove else 0
+  #print(popden_feat_df)
+  #from IPython import embed
+  #embed()
+  popden_feat_df = popden_feat_df.drop(col, axis)
 
-  # Rename Name column to match covid dataframe for merge
-  df.rename(columns={
-    covid_columns[1]: "Country"
-  }, inplace=True)
+  output_csv = output_folder + "/popden.csv"
 
-  population_df.rename(columns={
-    population_csv_columns[1]: "Country",
-    population_csv_columns[2]: "Population",
-    }, inplace=True)
-  
+  # 3. Write to features folder
+  if os.path.isfile(output_csv):
+    os.remove(output_csv)
 
-  df = pd.merge(df, population_df, on="Country", how='inner').drop_duplicates()
+  df_to_csv(output_csv, popden_feat_df)
 
-  # print(df["Population"][df["Country"]=="Pakistan"])
-  return df
-
-def latest_locations_with_popden():
-
-  # Look for the latest available file in the repo
-  latest_covid_file_url = parse_github_folder(covid_data_folder)
-
-  download_url = covid_raw_base_url + "/" + latest_covid_file_url.strftime(date_format + ".csv")
-  covid_locations = get_locations_df(download_url)
-
-  # print("Recovering population data per country...")
-  covid_locations = add_population_data(covid_locations)
-
-  return covid_locations
-
-if __name__ == "__main__":
-
-  covid_locations = latest_locations_with_popden()
-
-  # Save the data to a file.
-  write_to_csv("./data/features/popden/popden.csv", covid_locations)
+  return popden_feat_df
