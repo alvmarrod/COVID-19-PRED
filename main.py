@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 
 from covid19_feature import gen_covid19_feat
 from poprisk_feature import gen_poprisk_feat
+#from temperature_feature import gen_temp_feat
 from popden_feature import gen_popden_feat
+from lockdown_feature import gen_lockdown_feat
+#from borclosed import gen_border_feat
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -71,12 +74,6 @@ if __name__ == "__main__":
                   handicaps=handicaps,
                   remove_over=True)
 
-  # Mean Age
-  meanage_raw_file = "./data/raw/meanage/meanage.csv"
-  meanage_feat_csv = "./data/features/meanage/meanage.csv"
-  # gen_meanage_feat(meanage_raw_file,
-  #                 output_csv=meanage_feat_csv)
-
   # Mean Temperature
   temp_raw_file = "./data/raw/temp/temp.csv"
   temp_feat_csv = "./data/features/temp/temp.csv"
@@ -91,9 +88,9 @@ if __name__ == "__main__":
 
   # Gov. Measures 1 - Lockdown
   lockdown_raw_file = "./data/raw/govme/lockdown.csv"
-  lockdown_feat_csv = "./data/features/govme/lockdown.csv"
-  # gen_lockdown_feat(lockdown_raw_file,
-  #                 output_csv=lockdown_feat_csv)
+  lockdown_feat_folder = "./data/features/govme"
+  gen_lockdown_feat(lockdown_raw_file,
+                    output_folder=lockdown_feat_folder)
 
   # Gov. Measures 2 - Borders Closed
   borcls_raw_file = "./data/raw/govme/borcls.csv"
