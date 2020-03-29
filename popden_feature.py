@@ -89,7 +89,7 @@ def gen_popden_feat(input_raw="./data/raw/popden/",
                     handicaps=None,
                     remove_over=False):
   """This function process the raw CSV file with all the world's population
-  density aand creates the output CSV file with the classification of each
+  density and creates the output CSV file with the classification of each
   country based on its poulation density.
 
   It also allows to apply a specific correction factor to countries based on
@@ -100,7 +100,7 @@ def gen_popden_feat(input_raw="./data/raw/popden/",
   # Results are already multiple of 5, we apply the handicaps
   popden_raw_df = _read_popden_raw(input_raw, handicaps)
 
-  # 3. Finally we apply the classification
+  # 2. We apply the classification
   if remove_over:
     den = popden_raw_cols[-1]
     name = popden_raw_cols[1]

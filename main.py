@@ -83,13 +83,11 @@ if __name__ == "__main__":
   # gen_temp_feat(temp_raw_file,
   #              output_csv=temp_feat_csv)
 
-  # Population Risk - DONE
+  # Population Risk
   poprisk_raw_file = "./data/raw/poprisk/poprisk.csv"
-  poprisk_feat_png = "./data/features/poprisk/poprisk.png"
-  poprisk_feat_csv = "./data/features/poprisk/poprisk.csv"
-  #gen_poprisk_feat(poprisk_raw_file,
-  #                 output_png=poprisk_feat_png,
-  #                 output_csv=poprisk_feat_csv)
+  poprisk_feat_folder = "./data/features/poprisk"
+  gen_poprisk_feat(poprisk_raw_file,
+                   output_folder=poprisk_feat_folder)
 
   # Gov. Measures 1 - Lockdown
   lockdown_raw_file = "./data/raw/govme/lockdown.csv"

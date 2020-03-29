@@ -147,7 +147,6 @@ def plot_clustering(clusters_received,
   # Show it
   if plot:
     plt.show()
-
   
   if os.path.isfile(output_png):
     os.remove(output_png)
