@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 
 from covid19_feature import gen_covid19_feat
 from poprisk_feature import gen_poprisk_feat
-#from temperature_feature import gen_temp_feat
+from masks_feature import gen_masks_feat
 from popden_feature import gen_popden_feat
 from lockdown_feature import gen_lockdown_feat
-#from borclosed import gen_border_feat
+from bordersclosed_feature import gen_borders_feat
+# from pytorch_model import (train, test, predict)
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -69,34 +70,70 @@ if __name__ == "__main__":
   handicaps = {
     "Australia": 3
   }
-  gen_popden_feat(popden_raw_file,
-                  output_folder=popden_feat_folder,
-                  handicaps=handicaps,
-                  remove_over=True)
+  popden_df = gen_popden_feat(popden_raw_file,
+                              output_folder=popden_feat_folder,
+                              handicaps=handicaps,
+                              remove_over=True)
 
-  # Mean Temperature
-  temp_raw_file = "./data/raw/temp/temp.csv"
-  temp_feat_csv = "./data/features/temp/temp.csv"
-  # gen_temp_feat(temp_raw_file,
-  #              output_csv=temp_feat_csv)
+  # Masks Usage
+  masks_raw_file = "./data/raw/masks/masks.csv"
+  masks_feat_folder = "./data/features/masks"
+  masks_df = gen_masks_feat(masks_raw_file,
+                            output_folder=masks_feat_folder)
 
   # Population Risk
   poprisk_raw_file = "./data/raw/poprisk/poprisk.csv"
   poprisk_feat_folder = "./data/features/poprisk"
-  gen_poprisk_feat(poprisk_raw_file,
-                   output_folder=poprisk_feat_folder)
+  poprisk_df = gen_poprisk_feat(poprisk_raw_file,
+                                output_folder=poprisk_feat_folder)
 
   # Gov. Measures 1 - Lockdown
   lockdown_raw_file = "./data/raw/govme/lockdown.csv"
   lockdown_feat_folder = "./data/features/govme"
-  gen_lockdown_feat(lockdown_raw_file,
-                    output_folder=lockdown_feat_folder)
+  lockdown_df = gen_lockdown_feat(lockdown_raw_file,
+                                  output_folder=lockdown_feat_folder)
 
   # Gov. Measures 2 - Borders Closed
-  borcls_raw_file = "./data/raw/govme/borcls.csv"
-  borcls_feat_csv = "./data/features/govme/borcls.csv"
-  # gen_borcls_feat(lockdown_raw_file,
-  #                output_csv=lockdown_feat_csv)
+  borcls_raw_file = "./data/raw/govme/borders.csv"
+  borcls_feat_folder = "./data/features/govme"
+  borders_df = gen_borders_feat(borcls_raw_file,
+                                output_folder=borcls_feat_folder)
+
+  # --------------------------------------------------------
+
+  # 1. Prepare the data
+
+
+  # 2. Split in training data, test and prediction data
+
+  #T.manual_seed(1)
+  #np.random.seed(1)
+  # 1. load data
+  #print("Loading Iris data into memory \n")
+  #train_file = ".\\Data\\iris_train.txt"
+  #test_file = ".\\Data\\iris_test.txt"
+  #train_x = np.loadtxt(train_file, usecols=range(0,4),
+  #  delimiter=",",  skiprows=0, dtype=np.float32)
+  #train_y = np.loadtxt(train_file, usecols=[4],
+  #  delimiter=",", skiprows=0, dtype=np.float32)
+  #test_x = np.loadtxt(test_file, usecols=range(0,4),
+  #  delimiter=",",  skiprows=0, dtype=np.float32)
+  #test_y = np.loadtxt(test_file, usecols=[4],
+  #  delimiter=",", skiprows=0, dtype=np.float32)
+
+
+  # 3. Run Training + Test loop. Plot results to compare.
+
+
+  # 4. Plot graphics for best model.
+  # Grahpic 1 - Raw data plot (cases reported by governments)
+  # Graphic 2 - Predicted data from the model, taking as input the official
+  # data reported the each previous day
+  # Graphic 3 - Predicted data from the model, taking as input its own output
+  # from the previous day except for the very first day, that takes as input
+  # the official reports from the previous day
+
+
 
   # 1. Get population density values by executing our script
   # pbar.set_description(desc="Removing unnecesary fields...", refresh=True)
