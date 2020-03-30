@@ -33,6 +33,7 @@ To know how raw data has been processed into features, please refer to the [Medi
 * [Numpy](https://github.com/numpy/numpy)
 * [Pandas](https://github.com/pandas-dev/pandas)
 * [Matplotlib](https://github.com/matplotlib/matplotlib)
+* [PyTorch](https://pytorch.org/get-started/locally/)
 
 * [requests](https://github.com/psf/requests)
 * [tqdm](https://github.com/tqdm/tqdm)
