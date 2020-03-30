@@ -112,17 +112,37 @@ It is hard to classify where all the information has been found, so let us expla
 98. [Reunion](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_R%C3%A9union)
 99. [Austria](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Austria)
 100. [Ireland](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Republic_of_Ireland)
-101. 
-102. 
-103. 
-104. 
-105. 
-106. 
-107. 
-108. 
-109. 
-110. 
-111. 
+101. [France](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_France)
+102. [Turkey](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Turkey)
+103. [Iceland](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Iceland)
+104. [Ecuador](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Ecuador)
+105. [Azerbaijan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Azerbaijan)
+106. [Kazakhstan](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Kazakhstan)
+107. [Cayman Islands](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_the_Cayman_Islands)
+108. [Indonesia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Indonesia)
+109. [Senegal](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Senegal)
+110. [Ethiopia](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Ethiopia)
+111. [Guinea](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Guinea)
+112. [Antigua and Barbuda](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Antigua_and_Barbuda)
+113. [Aruba](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Aruba)
+114. [Chile](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Chile)
+115. [South Africa](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_South_Africa)
+116. [Ivory Coast](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Ivory_Coast)
+117. [Luxembourg](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Luxembourg)
+118. [Cameroon](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Cameroon)
+119. [Togo](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Togo)
+120. [Mexico](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Mexico)
+121. [Martinique](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Martinique)
+122. [French Guiana](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_French_Guiana)
+123. [Paraguay](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Paraguay)
+124. [Liechtenstein](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Liechtenstein)
+125. [Guyana](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Guyana)
+126. 
+127. 
+128. 
+129. 
+
+
 
 
 
