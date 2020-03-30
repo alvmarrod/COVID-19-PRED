@@ -8,7 +8,7 @@ This repo aims to do an analysis on COVID-19 spreading patterns based on worldwi
 
 2. As `population density` data we're fetching the latest data available from [World Population Review](https://worldpopulationreview.com/countries/). Since this data is annual, we're keeping it **stored** in the repo without any change in [Raw Population Density Folder](./data/raw/popden/). The script does use it directly, doesn't get it from elsewhere.
 
-3. As `temperature` data, we're fetching the data from ...
+3. As `masks usage` data have created a list hand-made using public domain knowledge. You can find more information and links both in our [Medium story](https://medium.com/@alvmarrod/predicting-covid-19-cases-with-machine-learning-454780a3a773) and our [Raw Masks Usage Folder](./data/raw/masks/).
 
 4. As `population risk` we have collected the information that we can find regarding the presence of `ACE2` cells in the human body depending of the population. You can find the raw information for `Weighted Risk` in the CSV in the [Raw Population Risk Folder](./data/raw/poprisk/).
 
@@ -22,7 +22,7 @@ To know how raw data has been processed into features, please refer to the [Medi
 
 2. The `population density` data has been processed and saved from [Raw Population Density Folder](./data/raw/popden/) to [Feature Population Density Folder](./data/features/popden/).
 
-3. The `temperature` has been processed and saved from [Raw Temperature Folder](./data/raw/temperature/) to [Feature Temperature Folder](./data/features/temperature/).
+3. The `masks usage` has been processed and saved from [Raw Masks Usage Folder](./data/raw/masks/) to [Feature Masks Usage Folder](./data/features/masks/).
 
 4. The `weighted population risk` that we have calculated has been processed as well and saved from [Raw Population Risk Folder](./data/raw/poprisk/) into the [Features Population Risk Folder](./data/features/poprisk/).
 
