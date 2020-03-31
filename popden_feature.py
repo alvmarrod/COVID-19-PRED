@@ -136,6 +136,11 @@ def gen_popden_feat(input_raw="./data/raw/popden/",
   #embed()
   popden_feat_df = popden_feat_df.drop(col, axis)
 
+  # Rename column to "Country"
+  popden_feat_df.rename(columns={
+    popden_raw_cols[1]: "Country"
+  }, inplace=True)
+
   output_csv = output_folder + "/popden.csv"
 
   # 3. Write to features folder
