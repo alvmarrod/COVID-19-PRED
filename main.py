@@ -10,7 +10,11 @@ from masks_feature import gen_masks_feat
 from popden_feature import gen_popden_feat
 from lockdown_feature import gen_lockdown_feat
 from bordersclosed_feature import gen_borders_feat
-# from pytorch_model import (train, test, predict)
+from data import (expand_cases_to_vector,
+                  fill_df_column_with_value,
+                  fill_df_column_date_based)
+
+import pytorch_model as ptm
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -102,9 +106,40 @@ if __name__ == "__main__":
   # --------------------------------------------------------
 
   # 1. Prepare the data
+  # Generate an unique dataset with features | output
+  # f1, f2, f3, f4, f5, f6, output
+  data = expand_cases_to_vector(confirmed)
 
+  # We feed 0 as default population density since it's the lowest and it's not
+  # going to be used for training if it doesn't existc
+  fill_df_column_with_value(data, "Popden", popden_df, "Classification", 1)
+
+  # 0 Default = No Masks
+  fill_df_column_with_value(data, "Masks", masks_df, "Mask", 0)
+
+  # 1 Default = Lowest Risk
+  fill_df_column_with_value(data, "Poprisk", poprisk_df, "Classification", 1)
+
+  # 0 Default = Doesn't apply
+  fill_df_column_date_based(data, "Lockdown", lockdown_df, 0)
+  fill_df_column_date_based(data, "Borders", borders_df, 0)
+
+  #data = pd.merge(data, borders_df, on="Country", how="inner")
+
+  # print(data)
+
+  #from IPython import embed
+  #embed()
 
   # 2. Split in training data, test and prediction data
+  np.random.seed(42)
+  idx = np.arange(len(data))
+
+  train_idx = idx[:(0.8*len(data))]
+  val_idx = idx[(0.8*len(data)):]
+
+  train_x, train_y = data[train_idx][:-1], data[train_idx][-1]
+  val_x, val_y = data[val_idx][:-1], data[val_idx][-1]
 
   #T.manual_seed(1)
   #np.random.seed(1)
@@ -120,10 +155,23 @@ if __name__ == "__main__":
   #  delimiter=",",  skiprows=0, dtype=np.float32)
   #test_y = np.loadtxt(test_file, usecols=[4],
   #  delimiter=",", skiprows=0, dtype=np.float32)
-
+  train_data = None
 
   # 3. Run Training + Test loop. Plot results to compare.
 
+  batch_size = 12
+  
+  # Creat the model
+  model = ptm.Net(input_size=6,
+                  hidden_size=6)
+  print(model)
+
+  # Train it
+  ptm.train(model,
+            dataset=train_data,
+            lr=learning_rate,
+            batch=batch_size,
+            epochs=max_epochs)
 
   # 4. Plot graphics for best model.
   # Grahpic 1 - Raw data plot (cases reported by governments)
