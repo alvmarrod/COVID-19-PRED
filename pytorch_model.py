@@ -3,10 +3,13 @@ and predict our use case.
 """
 
 import torch as T
+import torch.utils.data as tud
 # import torch.nn.functional as F
 
 import numpy as np
 import pandas as pd
+
+from tqdm import tqdm
 
 # -----------------------------------------------------------
 class Net(T.nn.Module):
@@ -121,8 +124,10 @@ def train(model, train_loader, eval_loader, device,
   val_losses = []
 
   # 3. Training itself
+  pbar = tqdm(total=(n_epochs*2))
   for epoch in range(n_epochs):
 
+    pbar.set_description("Training epoch: %s" % epoch)
     for x_batch, y_batch in train_loader:
 
       # Move to correct device, maybe not needed
@@ -131,6 +136,9 @@ def train(model, train_loader, eval_loader, device,
 
       loss = train_step(x_batch, y_batch)
       losses.append(loss)
+
+    pbar.update(1)
+    pbar.set_description("Evaluating epoch: %s" % epoch)
 
     # Evaluation side. No gradients required
     with T.no_grad():
@@ -146,6 +154,11 @@ def train(model, train_loader, eval_loader, device,
         val_loss = lf_instance(y_val, yhat)
         val_losses.append(val_loss.item())
 
+    pbar.update(1)
+
+  pbar.close()
+
+  return losses, val_losses
 
 # -----------------------------------------------------------
 def test(net, test_x, test_y):
@@ -193,7 +206,7 @@ def datagen(dataset, batch, shuffle=True):
 
 
 # -----------------------------------------------------------
-class CustomDataset(T.utils.Dataset):
+class CustomDataset(tud.Dataset):
     def __init__(self, x_tensor, y_tensor):
         self.x = x_tensor
         self.y = y_tensor

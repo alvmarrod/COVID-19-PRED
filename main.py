@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 
+import logging
 from tqdm import tqdm
+import datetime as dt
 import matplotlib.pyplot as plt
 
 from covid19_feature import gen_covid19_feat
@@ -14,9 +16,11 @@ from data import (expand_cases_to_vector,
                   fill_df_column_with_value,
                   fill_df_column_date_based)
 
-import pytorch_model as ptm
 import torch as T
-import T.utils.data as tud
+import torch.utils.data as tud
+import pytorch_model as ptm
+
+logging.basicConfig(level=logging.INFO)
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -65,12 +69,16 @@ if __name__ == "__main__":
   covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series"
   covid19_raw_folder = "./data/raw/covid/"
   covid19_feat_folder = "./data/features/covid/"
+
+  logging.info(f"{dt.datetime.now()} - Starting...")
+  logging.info(f"{dt.datetime.now()} - Getting COVID-19 Cases Data...")
   confirmed, deaths, recovered = gen_covid19_feat(covid19_repo_url,
                                                   covid_raw_base_url,
                                                   output_raw=covid19_raw_folder,
                                                   output_csv=covid19_feat_folder)
 
   # Population Density
+  logging.info(f"{dt.datetime.now()} - Getting Population Density Data...")
   popden_raw_file = "./data/raw/popden/popden.csv"
   popden_feat_folder = "./data/features/popden"
   handicaps = {
@@ -82,24 +90,28 @@ if __name__ == "__main__":
                               remove_over=True)
 
   # Masks Usage
+  logging.info(f"{dt.datetime.now()} - Getting Masks Usage Data...")
   masks_raw_file = "./data/raw/masks/masks.csv"
   masks_feat_folder = "./data/features/masks"
   masks_df = gen_masks_feat(masks_raw_file,
                             output_folder=masks_feat_folder)
 
   # Population Risk
+  logging.info(f"{dt.datetime.now()} - Getting Population Risk Data...")
   poprisk_raw_file = "./data/raw/poprisk/poprisk.csv"
   poprisk_feat_folder = "./data/features/poprisk"
   poprisk_df = gen_poprisk_feat(poprisk_raw_file,
                                 output_folder=poprisk_feat_folder)
 
   # Gov. Measures 1 - Lockdown
+  logging.info(f"{dt.datetime.now()} - Getting Lockdown Data...")
   lockdown_raw_file = "./data/raw/govme/lockdown.csv"
   lockdown_feat_folder = "./data/features/govme"
   lockdown_df = gen_lockdown_feat(lockdown_raw_file,
                                   output_folder=lockdown_feat_folder)
 
   # Gov. Measures 2 - Borders Closed
+  logging.info(f"{dt.datetime.now()} - Getting Borders Closing Data...")
   borcls_raw_file = "./data/raw/govme/borders.csv"
   borcls_feat_folder = "./data/features/govme"
   borders_df = gen_borders_feat(borcls_raw_file,
@@ -110,29 +122,37 @@ if __name__ == "__main__":
   # 1. Prepare the data
   # Generate an unique dataset with features | output
   # f1, f2, f3, f4, f5, f6, output
+  logging.info(f"{dt.datetime.now()} - Data merge...")
+  pbar = tqdm(6)
+
   data = expand_cases_to_vector(confirmed)
+  pbar.update(1)
 
   # We feed 0 as default population density since it's the lowest and it's not
   # going to be used for training if it doesn't existc
   fill_df_column_with_value(data, "Popden", popden_df, "Classification", 1)
+  pbar.update(1)
 
   # 0 Default = No Masks
   fill_df_column_with_value(data, "Masks", masks_df, "Mask", 0)
+  pbar.update(1)
 
   # 1 Default = Lowest Risk
   fill_df_column_with_value(data, "Poprisk", poprisk_df, "Classification", 1)
+  pbar.update(1)
 
   # 0 Default = Doesn't apply
   fill_df_column_date_based(data, "Lockdown", lockdown_df, 0)
+  pbar.update(1)
   fill_df_column_date_based(data, "Borders", borders_df, 0)
-
-  #data = pd.merge(data, borders_df, on="Country", how="inner")
-
-  # print(data)
+  pbar.update(1)
+  pbar.close()
 
   # 2. Split in training data, test and prediction data
   device = 'cuda' if T.cuda.is_available() else 'cpu'
 
+  logging.info(f"{dt.datetime.now()} - Data setup to feed the model...")
+  pbar = tqdm(5)
 
   x_cols = (np.arange(len(data.columns)) > 1)
   x_cols[-1] = False
@@ -142,9 +162,11 @@ if __name__ == "__main__":
   x_train_tensor = T.tensor(data.loc[:, x_cols].values.astype(np.float32)).float().to(device)
   y_train_tensor = T.tensor(data.loc[:, y_cols].values.astype(np.float32)).float().to(device)
   #y_train_tensor = T.from_numpy(y_train).float().to(device)
+  pbar.update(1)
 
   # From torch.Tensor to torch.Dataset
   dataset = tud.TensorDataset(x_train_tensor, y_train_tensor)
+  pbar.update(1)
 
   # Split dataset into training and validate parts
   train_per = 90
@@ -152,6 +174,7 @@ if __name__ == "__main__":
   epochs = 80
   train_dataset, val_dataset = tud.dataset.random_split(dataset, 
                                                         [train_per, val_per])
+  pbar.update(1)
 
   # From torch.Dataset to torch.DataLoader
   batch_size = 12
@@ -159,11 +182,15 @@ if __name__ == "__main__":
 
   train_loader = tud.DataLoader(dataset=train_dataset,
                                 batch_size=batch_size)
+  pbar.update(1)
 
   val_loader = tud.DataLoader(dataset=val_dataset,
                               batch_size=batch_size)
+  pbar.update(1)
+  pbar.close()
 
   # 3. Run Training + Test loop. Plot results to compare.
+  logging.info(f"{dt.datetime.now()} - Creating the model...")
   model = ptm.Net(input_size=6,
                   hidden_size=6).to(device)
   #print(model)
@@ -172,13 +199,20 @@ if __name__ == "__main__":
   embed()
 
   # Train it
-  ptm.train(model,
-            train_loader=train_loader,
-            eval_loader=val_loader,
-            device=device,
-            lr=learning_rate,
-            batch=batch_size,
-            epochs=epochs)
+  logging.info(f"{dt.datetime.now()} - Training...")
+  loss, val_loss = ptm.train(model,
+                             train_loader=train_loader,
+                             eval_loader=val_loader,
+                             device=device,
+                             lr=learning_rate,
+                             batch=batch_size,
+                             epochs=epochs)
+
+  # Save model
+  T.save(model.state_dict(), "./model_result")
+  logging.info(f"{dt.datetime.now()} - Latest Loss: {loss[-1]}")
+  logging.info(f"{dt.datetime.now()} - Latest Val Loss: {val_loss[-1]}")
+
 
   # 4. Plot graphics for best model.
   # Grahpic 1 - Raw data plot (cases reported by governments)
