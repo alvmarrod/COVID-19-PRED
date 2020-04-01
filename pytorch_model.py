@@ -110,7 +110,7 @@ def make_train_step(model, loss_fn, optimizer):
 
 # -----------------------------------------------------------
 def train(model, train_loader, eval_loader, device,
-          lr=0.01, batch=8, n_epochs=600):
+          lr=0.01, batch=8, epochs=600):
   """Trains using as much as n_epochs epochs.
   """
 
@@ -124,8 +124,8 @@ def train(model, train_loader, eval_loader, device,
   val_losses = []
 
   # 3. Training itself
-  pbar = tqdm(total=(n_epochs*2))
-  for epoch in range(n_epochs):
+  pbar = tqdm(total=(epochs*2))
+  for epoch in range(epochs):
 
     pbar.set_description("Training epoch: %s" % epoch)
     for x_batch, y_batch in train_loader:

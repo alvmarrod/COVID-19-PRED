@@ -123,7 +123,7 @@ if __name__ == "__main__":
   # Generate an unique dataset with features | output
   # f1, f2, f3, f4, f5, f6, output
   logging.info(f"{dt.datetime.now()} - Data merge...")
-  pbar = tqdm(6)
+  pbar = tqdm(7)
 
   data = expand_cases_to_vector(confirmed)
   pbar.update(1)
@@ -145,6 +145,15 @@ if __name__ == "__main__":
   fill_df_column_date_based(data, "Lockdown", lockdown_df, 0)
   pbar.update(1)
   fill_df_column_date_based(data, "Borders", borders_df, 0)
+  pbar.update(1)
+
+  # Make a copy to mantain all. In the one that continues, remove dates
+  # after March 16th
+  datacopy = data.copy(deep=True)
+  #from IPython import embed
+  #embed()
+  mask = [dt.datetime.strptime(date, r"%m/%d/%y") <= dt.datetime.strptime("03/16/20", r"%m/%d/%y") for date in data["Date"].values.tolist()]
+  data = data.loc[mask]
   pbar.update(1)
   pbar.close()
 
@@ -169,8 +178,8 @@ if __name__ == "__main__":
   pbar.update(1)
 
   # Split dataset into training and validate parts
-  train_per = 90
-  val_per = 10
+  train_per = round(len(dataset) * 0.9)
+  val_per = round(len(dataset) * 0.1)
   epochs = 80
   train_dataset, val_dataset = tud.dataset.random_split(dataset, 
                                                         [train_per, val_per])
@@ -195,8 +204,8 @@ if __name__ == "__main__":
                   hidden_size=6).to(device)
   #print(model)
 
-  from IPython import embed
-  embed()
+  #from IPython import embed
+  #embed()
 
   # Train it
   logging.info(f"{dt.datetime.now()} - Training...")
