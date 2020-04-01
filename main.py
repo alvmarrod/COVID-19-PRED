@@ -15,6 +15,8 @@ from data import (expand_cases_to_vector,
                   fill_df_column_date_based)
 
 import pytorch_model as ptm
+import torch as T
+import T.utils.data as tud
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -128,50 +130,55 @@ if __name__ == "__main__":
 
   # print(data)
 
-  #from IPython import embed
-  #embed()
-
   # 2. Split in training data, test and prediction data
-  np.random.seed(42)
-  idx = np.arange(len(data))
+  device = 'cuda' if T.cuda.is_available() else 'cpu'
 
-  train_idx = idx[:(0.8*len(data))]
-  val_idx = idx[(0.8*len(data)):]
 
-  train_x, train_y = data[train_idx][:-1], data[train_idx][-1]
-  val_x, val_y = data[val_idx][:-1], data[val_idx][-1]
+  x_cols = (np.arange(len(data.columns)) > 1)
+  x_cols[-1] = False
+  y_cols = np.arange(len(data.columns)) == (len(data.columns) - 1)
 
-  #T.manual_seed(1)
-  #np.random.seed(1)
-  # 1. load data
-  #print("Loading Iris data into memory \n")
-  #train_file = ".\\Data\\iris_train.txt"
-  #test_file = ".\\Data\\iris_test.txt"
-  #train_x = np.loadtxt(train_file, usecols=range(0,4),
-  #  delimiter=",",  skiprows=0, dtype=np.float32)
-  #train_y = np.loadtxt(train_file, usecols=[4],
-  #  delimiter=",", skiprows=0, dtype=np.float32)
-  #test_x = np.loadtxt(test_file, usecols=range(0,4),
-  #  delimiter=",",  skiprows=0, dtype=np.float32)
-  #test_y = np.loadtxt(test_file, usecols=[4],
-  #  delimiter=",", skiprows=0, dtype=np.float32)
-  train_data = None
+  # Data from Pandas.DataFrame to torch.Tensor
+  x_train_tensor = T.tensor(data.loc[:, x_cols].values.astype(np.float32)).float().to(device)
+  y_train_tensor = T.tensor(data.loc[:, y_cols].values.astype(np.float32)).float().to(device)
+  #y_train_tensor = T.from_numpy(y_train).float().to(device)
+
+  # From torch.Tensor to torch.Dataset
+  dataset = tud.TensorDataset(x_train_tensor, y_train_tensor)
+
+  # Split dataset into training and validate parts
+  train_per = 90
+  val_per = 10
+  epochs = 80
+  train_dataset, val_dataset = tud.dataset.random_split(dataset, 
+                                                        [train_per, val_per])
+
+  # From torch.Dataset to torch.DataLoader
+  batch_size = 12
+  learning_rate=0.01
+
+  train_loader = tud.DataLoader(dataset=train_dataset,
+                                batch_size=batch_size)
+
+  val_loader = tud.DataLoader(dataset=val_dataset,
+                              batch_size=batch_size)
 
   # 3. Run Training + Test loop. Plot results to compare.
-
-  batch_size = 12
-  
-  # Creat the model
   model = ptm.Net(input_size=6,
-                  hidden_size=6)
-  print(model)
+                  hidden_size=6).to(device)
+  #print(model)
+
+  from IPython import embed
+  embed()
 
   # Train it
   ptm.train(model,
-            dataset=train_data,
+            train_loader=train_loader,
+            eval_loader=val_loader,
+            device=device,
             lr=learning_rate,
             batch=batch_size,
-            epochs=max_epochs)
+            epochs=epochs)
 
   # 4. Plot graphics for best model.
   # Grahpic 1 - Raw data plot (cases reported by governments)
