@@ -63,25 +63,6 @@ def optimizer(opt, model, lr=0.01):
   return func(model.parameters(), lr=lr)
 
 # -----------------------------------------------------------
-def calculate_mae(model, data_x, data_y):
-  """Calculates the mean absolute-loss of the provided model based on 
-  the provided test data
-  """
-
-  # Code is for accuracy. To do.
-
-  X = T.Tensor(data_x)
-  Y = T.LongTensor(data_y)
-
-  oupt = model(X)
-
-  (_, arg_maxs) = T.max(oupt.data, dim=1)
-  num_correct = T.sum(Y==arg_maxs)
-
-  acc = (num_correct * 100.0 / len(data_y))
-  return acc.item()
-
-# -----------------------------------------------------------
 def make_train_step(model, loss_fn, optimizer):
   """Generates a function that performs a step in the train loop
   """
@@ -161,15 +142,32 @@ def train(model, train_loader, eval_loader, device,
   return losses, val_losses
 
 # -----------------------------------------------------------
-def test(net, test_x, test_y):
+def test(model, data_loader=None):
   """Tests and evaluates the model to get the desired metrics.
   """
-  
-  # set eval mode
-  net = net.eval()  
 
-  mae = calculate_mae(net, test_x, test_y)
-  print("Mean Absolute Loss on test data = %0.2f%%" % mae)
+  if data_loader is None:
+    raise Exception("Doesn't exist Data loader for test!")
+
+  # 1. Create the loss function
+  lf_instance = loss_func("MAE")
+  val_losses = []
+
+  # Evaluation
+  with T.no_grad():
+
+    for x_val, y_val in data_loader:
+
+      x_val = x_val.to(device)
+      y_val = y_val.to(device)
+
+      model.eval()
+
+      yhat = model(x_val)
+      val_loss = lf_instance(y_val, yhat)
+      val_losses.append(val_loss.item())
+
+  return (val_losses.sum() / len(val_losses))
 
 # -----------------------------------------------------------
 def predict(net, input):

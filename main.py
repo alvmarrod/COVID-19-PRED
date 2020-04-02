@@ -123,31 +123,38 @@ if __name__ == "__main__":
   # Generate an unique dataset with features | output
   # f1, f2, f3, f4, f5, f6, output
   logging.info(f"{dt.datetime.now()} - Data merge...")
-  pbar = tqdm(7)
+  pbar = tqdm(total=7)
 
+  pbar.set_description("Expand cases into vector of samples...")
   data = expand_cases_to_vector(confirmed)
   pbar.update(1)
 
   # We feed 0 as default population density since it's the lowest and it's not
   # going to be used for training if it doesn't existc
+  pbar.set_description("Fill with Popden feature...")
   fill_df_column_with_value(data, "Popden", popden_df, "Classification", 1)
   pbar.update(1)
 
   # 0 Default = No Masks
+  pbar.set_description("Fill with Masks feature...")
   fill_df_column_with_value(data, "Masks", masks_df, "Mask", 0)
   pbar.update(1)
 
   # 1 Default = Lowest Risk
+  pbar.set_description("Fill with Poprisk feature...")
   fill_df_column_with_value(data, "Poprisk", poprisk_df, "Classification", 1)
   pbar.update(1)
 
   # 0 Default = Doesn't apply
+  pbar.set_description("Fill with Lockdown feature...")
   fill_df_column_date_based(data, "Lockdown", lockdown_df, 0)
   pbar.update(1)
+  pbar.set_description("Fill with Borders feature...")
   fill_df_column_date_based(data, "Borders", borders_df, 0)
   pbar.update(1)
 
   # Make a copy to mantain all. In the one that continues, remove dates
+  pbar.set_description("Removing dates after March 16th for training...")
   # after March 16th
   datacopy = data.copy(deep=True)
   #from IPython import embed
@@ -161,8 +168,8 @@ if __name__ == "__main__":
   device = 'cuda' if T.cuda.is_available() else 'cpu'
 
   logging.info(f"{dt.datetime.now()} - Data setup to feed the model...")
-  pbar = tqdm(5)
-
+  pbar = tqdm(total=5)
+  pbar.set_description("From Pandas.DataFrame to torch.Tensor...")
   x_cols = (np.arange(len(data.columns)) > 1)
   x_cols[-1] = False
   y_cols = np.arange(len(data.columns)) == (len(data.columns) - 1)
@@ -174,10 +181,12 @@ if __name__ == "__main__":
   pbar.update(1)
 
   # From torch.Tensor to torch.Dataset
+  pbar.set_description("From torch.Tensor to torch.Dataset...")
   dataset = tud.TensorDataset(x_train_tensor, y_train_tensor)
   pbar.update(1)
 
   # Split dataset into training and validate parts
+  pbar.set_description("Split dataset into training / validate...")
   train_per = round(len(dataset) * 0.9)
   val_per = round(len(dataset) * 0.1)
   epochs = 80
@@ -186,12 +195,14 @@ if __name__ == "__main__":
   pbar.update(1)
 
   # From torch.Dataset to torch.DataLoader
+  pbar.set_description("From torch.Dataset to torch.DataLoader...")
   batch_size = 12
   learning_rate=0.01
 
   train_loader = tud.DataLoader(dataset=train_dataset,
                                 batch_size=batch_size)
   pbar.update(1)
+  pbar.set_description("From torch.Dataset to torch.DataLoader...")
 
   val_loader = tud.DataLoader(dataset=val_dataset,
                               batch_size=batch_size)
@@ -217,10 +228,15 @@ if __name__ == "__main__":
                              batch=batch_size,
                              epochs=epochs)
 
+  # Test it
+  val_loss_test = ptm.test(model, data_loader=val_loader)
+
   # Save model
-  T.save(model.state_dict(), "./model_result")
+  T.save(model.state_dict(), f"./model_result_val_loss_{val_loss[-1]}")
+
   logging.info(f"{dt.datetime.now()} - Latest Loss: {loss[-1]}")
   logging.info(f"{dt.datetime.now()} - Latest Val Loss: {val_loss[-1]}")
+  logging.info(f"{dt.datetime.now()} - Test: {val_loss_test}")
 
 
   # 4. Plot graphics for best model.
