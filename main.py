@@ -20,7 +20,8 @@ import torch as T
 import torch.utils.data as tud
 import pytorch_model as ptm
 
-logging.basicConfig(level=logging.INFO)
+log_format="%(asctime)s - %(message)s"
+logging.basicConfig(level=logging.INFO, format=log_format)
 
 # Column order imposed by the data source of the COVID-19
 covid_columns = ["Province/State", 
@@ -74,8 +75,8 @@ if __name__ == "__main__":
   logging.info(f"{dt.datetime.now()} - Getting COVID-19 Cases Data...")
   confirmed, deaths, recovered = gen_covid19_feat(covid19_repo_url,
                                                   covid_raw_base_url,
-                                                  output_raw=covid19_raw_folder,
-                                                  output_csv=covid19_feat_folder)
+                                                  input_raw=covid19_raw_folder,
+                                                  output_folder=covid19_feat_folder)
 
   # Population Density
   logging.info(f"{dt.datetime.now()} - Getting Population Density Data...")
@@ -234,8 +235,8 @@ if __name__ == "__main__":
   # Save model
   T.save(model.state_dict(), f"./model_result_val_loss_{val_loss_test}")
 
-  logging.info(f"{dt.datetime.now()} - Latest Loss: {loss[-1]}")
-  logging.info(f"{dt.datetime.now()} - Latest Val Loss: {val_loss[-1]}")
+  #logging.info(f"{dt.datetime.now()} - Latest Loss: {loss[-1]}")
+  #logging.info(f"{dt.datetime.now()} - Latest Val Loss: {val_loss[-1]}")
   logging.info(f"{dt.datetime.now()} - Test: {val_loss_test}")
 
 

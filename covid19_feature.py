@@ -39,21 +39,6 @@ def _read_covid_raw(folder, type):
   if raw_df is None:
     raise Exception(f"Type {type} not found in raw data")
 
-  # Remove unnecesary columns
-  remove = "cols"
-  axis = 1 if "cols" in remove else 0
-  raw_df = raw_df.drop(covid_columns[0], axis)
-  raw_df = raw_df.drop(covid_columns[2], axis)
-  raw_df = raw_df.drop(covid_columns[3], axis)
-
-  # Group by country
-  raw_df = raw_df.groupby(by=covid_columns[1], as_index=False).sum()
-
-  # Rename column to only "Country"
-  raw_df.rename(columns={
-    covid_columns[1]: "Country"
-  }, inplace=True)
-
   # Make the results to be multiple of 5
   for col in raw_df.columns:
     if np.issubdtype(raw_df[col].dtype, np.number):
@@ -63,8 +48,8 @@ def _read_covid_raw(folder, type):
 
 def gen_covid19_feat(covid19_dr_url,
                      covid19_raw_url,
-                     output_raw="./data/raw/covid/",
-                     output_csv="./data/features/covid"):
+                     input_raw="./data/raw/covid/",
+                     output_folder="./data/features/covid"):
   """This function receives the URL from the repository where CSV with the
   time series reports of the COVID-19 are stored. Then it downloads them all
   into the specified as RAW folder, and creates their respective CSV in the
@@ -77,7 +62,7 @@ def gen_covid19_feat(covid19_dr_url,
   covid_files_list = get_files_from_github_folder(covid19_dr_url)
 
   # Prepare URLs to download
-  covid_url_list = [[output_raw + "/" + file + ".csv", 
+  covid_url_list = [[input_raw + "/" + file + ".csv", 
                     covid19_raw_url + "/" + file + ".csv"] 
                     for file in covid_files_list]
 
@@ -96,10 +81,10 @@ def gen_covid19_feat(covid19_dr_url,
   
   for case_type in types:
 
-    case_df = _read_covid_raw(output_raw, case_type)
+    case_df = _read_covid_raw(input_raw, case_type)
     results.append(case_df)
 
-    output_file = output_csv + f"/{case_type}.csv"
+    output_file = output_folder + f"/{case_type}.csv"
 
     # 3. Write to features folder
     if os.path.isfile(output_file):
