@@ -212,32 +212,72 @@ if __name__ == "__main__":
 
   # 3. Run Training + Test loop. Plot results to compare.
   logging.info(f"{dt.datetime.now()} - Creating the model...")
-  model = ptm.Net(input_size=6,
-                  hidden_size=6).to(device)
-  #print(model)
 
-  #from IPython import embed
-  #embed()
+  epoch_array = [60, 80, 100]
+  batch_array = [12, 48]
+  lr_array = [0.001, 0.01, 0.1]
+  hidden_array = [6, 8, 10]
 
-  # Train it
-  logging.info(f"{dt.datetime.now()} - Training...")
-  loss, val_loss = ptm.train(model,
-                             train_loader=train_loader,
-                             eval_loader=val_loader,
-                             device=device,
-                             lr=learning_rate,
-                             batch=batch_size,
-                             epochs=epochs)
+  results = pd.DataFrame(
+    columns = [
+      "Epochs",
+      "Batch",
+      "Lr",
+      "Hidden",
+      "Iter",
+      "ValLoss"
+    ]
+  )
 
-  # Test it
-  val_loss_test = ptm.test(model, device, data_loader=val_loader)
+  logging.info(f"\t{dt.datetime.now()} - Training")
+  for epoch in epoch_array:
 
-  # Save model
-  T.save(model.state_dict(), f"./model_result_val_loss_{val_loss_test}")
+    for batch in batch_array:
 
-  #logging.info(f"{dt.datetime.now()} - Latest Loss: {loss[-1]}")
-  #logging.info(f"{dt.datetime.now()} - Latest Val Loss: {val_loss[-1]}")
-  logging.info(f"{dt.datetime.now()} - Test: {val_loss_test}")
+      for lr in lr_array:
+
+        for hidden in hidden_array:
+
+          logging.info(f"\t{dt.datetime.now()} - Training")
+          logging.info(f"\t{dt.datetime.now()} - Epoch {epoch} - Batch {batch} - Lr {lr} - hidden {hidden}")
+
+          for i in range(0, 5):
+
+            logging.info(f"\t{dt.datetime.now()} - Iteration {i+1}")
+
+            model = ptm.Net(input_size=6,
+                            hidden_size=hidden).to(device)
+
+            # Train it
+            #logging.info(f"\t{dt.datetime.now()} - Training...")
+            loss, val_loss = ptm.train(model,
+                                      train_loader=train_loader,
+                                      eval_loader=val_loader,
+                                      device=device,
+                                      lr=learning_rate,
+                                      batch=batch_size,
+                                      epochs=epochs)
+
+            # Test it
+            #logging.info(f"\t{dt.datetime.now()} - Testing...")
+            val_loss_test = ptm.test(model, device, data_loader=val_loader)
+
+            # Save model
+            #logging.info(f"\t{dt.datetime.now()} - Saving model...")
+            logging.info(f"\t{dt.datetime.now()} - Test: {val_loss_test}")
+
+            T.save(model.state_dict(),
+                   f"./models/model_epoch_{epoch}_batch_{batch}_lr_{lr}_hidden_{hidden}_i_{i}_valloss_{val_loss_test}")
+
+            # Save to variables to plot
+            results.loc[len(results)] = [epoch,
+                                         batch,
+                                         lr,
+                                         hidden,
+                                         i,
+                                         val_loss_test]
+
+  # Save data to plot to file
 
 
   # 4. Plot graphics for best model.
