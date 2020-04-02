@@ -229,7 +229,7 @@ if __name__ == "__main__":
                              epochs=epochs)
 
   # Test it
-  val_loss_test = ptm.test(model, data_loader=val_loader)
+  val_loss_test = ptm.test(model, device, data_loader=val_loader)
 
   # Save model
   T.save(model.state_dict(), f"./model_result_val_loss_{val_loss[-1]}")

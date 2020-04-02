@@ -142,7 +142,7 @@ def train(model, train_loader, eval_loader, device,
   return losses, val_losses
 
 # -----------------------------------------------------------
-def test(model, data_loader=None):
+def test(model, device, data_loader=None):
   """Tests and evaluates the model to get the desired metrics.
   """
 
@@ -167,7 +167,7 @@ def test(model, data_loader=None):
       val_loss = lf_instance(y_val, yhat)
       val_losses.append(val_loss.item())
 
-  return (val_losses.sum() / len(val_losses))
+  return (sum(val_losses) / len(val_losses))
 
 # -----------------------------------------------------------
 def predict(net, input):
