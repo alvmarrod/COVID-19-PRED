@@ -71,15 +71,15 @@ if __name__ == "__main__":
   covid19_raw_folder = "./data/raw/covid/"
   covid19_feat_folder = "./data/features/covid/"
 
-  logging.info(f"{dt.datetime.now()} - Starting...")
-  logging.info(f"{dt.datetime.now()} - Getting COVID-19 Cases Data...")
+  logging.info(f"Starting...")
+  logging.info(f"Getting COVID-19 Cases Data...")
   confirmed, deaths, recovered = gen_covid19_feat(covid19_repo_url,
                                                   covid_raw_base_url,
                                                   input_raw=covid19_raw_folder,
                                                   output_folder=covid19_feat_folder)
 
   # Population Density
-  logging.info(f"{dt.datetime.now()} - Getting Population Density Data...")
+  logging.info(f"Getting Population Density Data...")
   popden_raw_file = "./data/raw/popden/popden.csv"
   popden_feat_folder = "./data/features/popden"
   handicaps = {
@@ -91,28 +91,28 @@ if __name__ == "__main__":
                               remove_over=True)
 
   # Masks Usage
-  logging.info(f"{dt.datetime.now()} - Getting Masks Usage Data...")
+  logging.info(f"Getting Masks Usage Data...")
   masks_raw_file = "./data/raw/masks/masks.csv"
   masks_feat_folder = "./data/features/masks"
   masks_df = gen_masks_feat(masks_raw_file,
                             output_folder=masks_feat_folder)
 
   # Population Risk
-  logging.info(f"{dt.datetime.now()} - Getting Population Risk Data...")
+  logging.info(f"Getting Population Risk Data...")
   poprisk_raw_file = "./data/raw/poprisk/poprisk.csv"
   poprisk_feat_folder = "./data/features/poprisk"
   poprisk_df = gen_poprisk_feat(poprisk_raw_file,
                                 output_folder=poprisk_feat_folder)
 
   # Gov. Measures 1 - Lockdown
-  logging.info(f"{dt.datetime.now()} - Getting Lockdown Data...")
+  logging.info(f"Getting Lockdown Data...")
   lockdown_raw_file = "./data/raw/govme/lockdown.csv"
   lockdown_feat_folder = "./data/features/govme"
   lockdown_df = gen_lockdown_feat(lockdown_raw_file,
                                   output_folder=lockdown_feat_folder)
 
   # Gov. Measures 2 - Borders Closed
-  logging.info(f"{dt.datetime.now()} - Getting Borders Closing Data...")
+  logging.info(f"Getting Borders Closing Data...")
   borcls_raw_file = "./data/raw/govme/borders.csv"
   borcls_feat_folder = "./data/features/govme"
   borders_df = gen_borders_feat(borcls_raw_file,
@@ -123,7 +123,7 @@ if __name__ == "__main__":
   # 1. Prepare the data
   # Generate an unique dataset with features | output
   # f1, f2, f3, f4, f5, f6, output
-  logging.info(f"{dt.datetime.now()} - Data merge...")
+  logging.info(f"Data merge...")
   pbar = tqdm(total=7)
 
   pbar.set_description("Expand cases into vector of samples...")
@@ -168,7 +168,7 @@ if __name__ == "__main__":
   # 2. Split in training data, test and prediction data
   device = 'cuda' if T.cuda.is_available() else 'cpu'
 
-  logging.info(f"{dt.datetime.now()} - Data setup to feed the model...")
+  logging.info(f"Data setup to feed the model...")
   pbar = tqdm(total=5)
   pbar.set_description("From Pandas.DataFrame to torch.Tensor...")
   x_cols = (np.arange(len(data.columns)) > 1)
@@ -213,10 +213,10 @@ if __name__ == "__main__":
   # 3. Run Training + Test loop. Plot results to compare.
   logging.info(f"{dt.datetime.now()} - Creating the model...")
 
-  epoch_array = [60, 80, 100]
+  epoch_array = [60, 80, 100, 120]
   batch_array = [12, 48]
   lr_array = [0.001, 0.01, 0.1]
-  hidden_array = [6, 8, 10]
+  hidden_array = [6, 8, 10, 12]
 
   results = pd.DataFrame(
     columns = [
@@ -229,8 +229,8 @@ if __name__ == "__main__":
     ]
   )
 
-  logging.info(f"\t{dt.datetime.now()} - Training")
-  for epoch in epoch_array:
+  logging.info(f"\tTraining")
+  for epochs in epoch_array:
 
     for batch in batch_array:
 
@@ -238,39 +238,36 @@ if __name__ == "__main__":
 
         for hidden in hidden_array:
 
-          logging.info(f"\t{dt.datetime.now()} - Training")
-          logging.info(f"\t{dt.datetime.now()} - Epoch {epoch} - Batch {batch} - Lr {lr} - hidden {hidden}")
+          logging.info(f"\n\tEpochs {epochs} - Batch {batch} - Lr {lr} - hidden {hidden}")
 
-          for i in range(0, 5):
+          for i in range(0, 3):
 
-            logging.info(f"\t{dt.datetime.now()} - Iteration {i+1}")
+            logging.info(f"\tIteration {i+1}")
+            T.manual_seed(i*i)
 
             model = ptm.Net(input_size=6,
                             hidden_size=hidden).to(device)
 
             # Train it
-            #logging.info(f"\t{dt.datetime.now()} - Training...")
             loss, val_loss = ptm.train(model,
                                       train_loader=train_loader,
                                       eval_loader=val_loader,
                                       device=device,
-                                      lr=learning_rate,
-                                      batch=batch_size,
+                                      lr=lr,
+                                      batch=batch,
                                       epochs=epochs)
 
             # Test it
-            #logging.info(f"\t{dt.datetime.now()} - Testing...")
             val_loss_test = ptm.test(model, device, data_loader=val_loader)
 
             # Save model
-            #logging.info(f"\t{dt.datetime.now()} - Saving model...")
-            logging.info(f"\t{dt.datetime.now()} - Test: {val_loss_test}")
+            logging.info(f"\tTest: {val_loss_test}")
 
             T.save(model.state_dict(),
-                   f"./models/model_epoch_{epoch}_batch_{batch}_lr_{lr}_hidden_{hidden}_i_{i}_valloss_{val_loss_test}")
+                   f"./models/model_epochs_{epochs}_batch_{batch}_lr_{lr}_hidden_{hidden}_i_{i}_valloss_{val_loss_test}")
 
             # Save to variables to plot
-            results.loc[len(results)] = [epoch,
+            results.loc[len(results)] = [epochs,
                                          batch,
                                          lr,
                                          hidden,
@@ -278,7 +275,8 @@ if __name__ == "__main__":
                                          val_loss_test]
 
   # Save data to plot to file
-
+  training_df = pd.DataFrame(results)
+  training_df.to_csv(header=False)
 
   # 4. Plot graphics for best model.
   # Grahpic 1 - Raw data plot (cases reported by governments)

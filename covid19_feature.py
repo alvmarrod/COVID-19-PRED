@@ -39,6 +39,21 @@ def _read_covid_raw(folder, type):
   if raw_df is None:
     raise Exception(f"Type {type} not found in raw data")
 
+  # Remove unnecesary columns	
+  remove = "cols"	
+  axis = 1 if "cols" in remove else 0	
+  raw_df = raw_df.drop(covid_columns[0], axis)	
+  raw_df = raw_df.drop(covid_columns[2], axis)	
+  raw_df = raw_df.drop(covid_columns[3], axis)	
+
+  # Group by country	
+  raw_df = raw_df.groupby(by=covid_columns[1], as_index=False).sum()	
+
+  # Rename column to only "Country"	
+  raw_df.rename(columns={	
+    covid_columns[1]: "Country"	
+  }, inplace=True)
+
   # Make the results to be multiple of 5
   for col in raw_df.columns:
     if np.issubdtype(raw_df[col].dtype, np.number):

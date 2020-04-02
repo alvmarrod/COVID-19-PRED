@@ -25,7 +25,7 @@ class Net(T.nn.Module):
     self.relu1 = T.nn.ReLU()
     
     # 2. Fully connect layer
-    hl2_size = hidden_size / 2
+    hl2_size = int(hidden_size / 2)
     self.fc2 = T.nn.Linear(hidden_size, hl2_size)
     self.relu2 = T.nn.ReLU()
 
