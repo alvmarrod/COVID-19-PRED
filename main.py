@@ -63,13 +63,13 @@ def draw_aggr(df, grp_col, data_col):
 
   draw_data_in_bar(values, labels, title)
 
-def arg_val(default, override):
+def arg_val(default, override, kind):
   """Return the argument value to use, making sure it is a list
   """
   if override is None:
     return default
   else:
-    return [override]
+    return [kind(override)]
 
 if __name__ == "__main__":
 
@@ -89,16 +89,16 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
   epoch_array = [20, 40, 60, 80, 100, 120]
-  epoch_array = arg_val(epoch_array, args.epochs)
+  epoch_array = arg_val(epoch_array, args.epochs, int)
 
   batch_array = [12, 48]
-  batch_array = arg_val(batch_array, args.batch)
+  batch_array = arg_val(batch_array, args.batch, int)
 
   lr_array = [0.001, 0.01, 0.1]
-  lr_array = arg_val(lr_array, args.lr)
+  lr_array = arg_val(lr_array, args.lr, float)
 
   hidden_array = [6, 8, 10, 12]
-  hidden_array = arg_val(hidden_array, args.hidden)
+  hidden_array = arg_val(hidden_array, args.hidden, int)
 
   # 0. Generate features
 
@@ -266,10 +266,10 @@ if __name__ == "__main__":
 
       # From torch.Dataset to torch.DataLoader
       train_loader = tud.DataLoader(dataset=train_dataset,
-                                    batch_size=batch_size)
+                                    batch_size=batch)
 
       val_loader = tud.DataLoader(dataset=val_dataset,
-                                  batch_size=batch_size)
+                                  batch_size=batch)
 
       for lr in lr_array:
 
