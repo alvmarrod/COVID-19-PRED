@@ -20,6 +20,8 @@ import torch as T
 import torch.utils.data as tud
 import pytorch_model as ptm
 
+import argparse
+
 log_format="%(asctime)s - %(message)s"
 logging.basicConfig(level=logging.INFO, format=log_format)
 
@@ -61,13 +63,50 @@ def draw_aggr(df, grp_col, data_col):
 
   draw_data_in_bar(values, labels, title)
 
+def arg_val(default, override):
+  """Return the argument value to use, making sure it is a list
+  """
+  if override is None:
+    return default
+  else:
+    return [override]
+
 if __name__ == "__main__":
+
+  # Arguments
+  desc = [
+    "Executes a NN model to solve the COVID-19 confirmed cases. ",
+    "Can both train and infer the model.\n",
+    "If any parameter is specified when executing, it will override",
+    "the default training loop and become a single value execution."
+  ]
+  descstr = "".join(desc)
+  parser = argparse.ArgumentParser(description=descstr)
+  parser.add_argument("--epochs", help="Number of epochs")
+  parser.add_argument("--batch", help="Batch size")
+  parser.add_argument("--lr", help="Static learning rate")
+  parser.add_argument("--hidden", help="Size of the first hidden layer")
+  args = parser.parse_args()
+
+  epoch_array = [20, 40, 60, 80, 100, 120]
+  epoch_array = arg_val(epoch_array, args.epochs)
+
+  batch_array = [12, 48]
+  batch_array = arg_val(batch_array, args.batch)
+
+  lr_array = [0.001, 0.01, 0.1]
+  lr_array = arg_val(lr_array, args.lr)
+
+  hidden_array = [6, 8, 10, 12]
+  hidden_array = arg_val(hidden_array, args.hidden)
 
   # 0. Generate features
 
   # COVID-19
-  covid19_repo_url = r"https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series"
-  covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series"
+  covid19_repo_url = r"https://github.com/CSSEGISandData/COVID-19/tree/master/" + \
+                     r"csse_covid_19_data/csse_covid_19_time_series"
+  covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/" + \
+                       r"COVID-19/master/csse_covid_19_data/csse_covid_19_time_series"
   covid19_raw_folder = "./data/raw/covid/"
   covid19_feat_folder = "./data/features/covid/"
 
@@ -177,7 +216,7 @@ if __name__ == "__main__":
   device = 'cuda' if T.cuda.is_available() else 'cpu'
 
   logging.info(f"Data setup to feed the model...")
-  pbar = tqdm(total=5)
+  pbar = tqdm(total=3)
   pbar.set_description("From Pandas.DataFrame to torch.Tensor...")
   x_cols = (np.arange(len(data.columns)) > 1)
   x_cols[-1] = False
@@ -204,29 +243,10 @@ if __name__ == "__main__":
   train_dataset, val_dataset = tud.dataset.random_split(dataset, 
                                                         [train_per, val_per])
   pbar.update(1)
-
-  # From torch.Dataset to torch.DataLoader
-  pbar.set_description("From torch.Dataset to torch.DataLoader...")
-  batch_size = 12
-  learning_rate=0.01
-
-  train_loader = tud.DataLoader(dataset=train_dataset,
-                                batch_size=batch_size)
-  pbar.update(1)
-  pbar.set_description("From torch.Dataset to torch.DataLoader...")
-
-  val_loader = tud.DataLoader(dataset=val_dataset,
-                              batch_size=batch_size)
-  pbar.update(1)
   pbar.close()
 
   # 3. Run Training + Test loop. Plot results to compare.
   logging.info(f"{dt.datetime.now()} - Creating the model...")
-
-  epoch_array = [20, 40, 60, 80, 100, 120]
-  batch_array = [12, 48]
-  lr_array = [0.001, 0.01, 0.1]
-  hidden_array = [6, 8, 10, 12]
 
   results = pd.DataFrame(
     columns = [
@@ -243,6 +263,13 @@ if __name__ == "__main__":
   for epochs in epoch_array:
 
     for batch in batch_array:
+
+      # From torch.Dataset to torch.DataLoader
+      train_loader = tud.DataLoader(dataset=train_dataset,
+                                    batch_size=batch_size)
+
+      val_loader = tud.DataLoader(dataset=val_dataset,
+                                  batch_size=batch_size)
 
       for lr in lr_array:
 
