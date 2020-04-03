@@ -124,7 +124,7 @@ if __name__ == "__main__":
   # Generate an unique dataset with features | output
   # f1, f2, f3, f4, f5, f6, output
   logging.info(f"Data merge...")
-  pbar = tqdm(total=7)
+  pbar = tqdm(total=8)
 
   pbar.set_description("Expand cases into vector of samples...")
   data = expand_cases_to_vector(confirmed)
@@ -160,9 +160,17 @@ if __name__ == "__main__":
   datacopy = data.copy(deep=True)
   #from IPython import embed
   #embed()
-  mask = [dt.datetime.strptime(date, r"%m/%d/%y") <= dt.datetime.strptime("03/16/20", r"%m/%d/%y") for date in data["Date"].values.tolist()]
+  mask = [dt.datetime.strptime(date, r"%m/%d/%y") <= \
+          dt.datetime.strptime("03/16/20", r"%m/%d/%y") \
+          for date in data["Date"].values.tolist()]
   data = data.loc[mask]
   pbar.update(1)
+
+  pbar.set_description("Removing samples with 0 to 0 cases...")
+  mask = (data["NextDay"]==0)
+  data = data.loc[mask]
+  pbar.update(1)
+
   pbar.close()
 
   # 2. Split in training data, test and prediction data
@@ -189,7 +197,9 @@ if __name__ == "__main__":
   # Split dataset into training and validate parts
   pbar.set_description("Split dataset into training / validate...")
   train_per = round(len(dataset) * 0.9)
+  logging.info(f"Training samples: {train_per}")
   val_per = round(len(dataset) * 0.1)
+  logging.info(f"Validation samples: {val_per}")
   epochs = 80
   train_dataset, val_dataset = tud.dataset.random_split(dataset, 
                                                         [train_per, val_per])
@@ -213,7 +223,7 @@ if __name__ == "__main__":
   # 3. Run Training + Test loop. Plot results to compare.
   logging.info(f"{dt.datetime.now()} - Creating the model...")
 
-  epoch_array = [60, 80, 100, 120]
+  epoch_array = [20, 40, 60, 80, 100, 120]
   batch_array = [12, 48]
   lr_array = [0.001, 0.01, 0.1]
   hidden_array = [6, 8, 10, 12]
@@ -238,7 +248,7 @@ if __name__ == "__main__":
 
         for hidden in hidden_array:
 
-          logging.info(f"\n\tEpochs {epochs} - Batch {batch} - Lr {lr} - hidden {hidden}")
+          logging.info(f"\tEpochs {epochs} - Batch {batch} - Lr {lr} - hidden {hidden}")
 
           for i in range(0, 3):
 
@@ -261,10 +271,11 @@ if __name__ == "__main__":
             val_loss_test = ptm.test(model, device, data_loader=val_loader)
 
             # Save model
-            logging.info(f"\tTest: {val_loss_test}")
+            logging.info(f"\tTest: {val_loss_test}\n")
 
-            T.save(model.state_dict(),
-                   f"./models/model_epochs_{epochs}_batch_{batch}_lr_{lr}_hidden_{hidden}_i_{i}_valloss_{val_loss_test}")
+            filename = f"./models/model_epochs_{epochs}_batch_{batch}_" + \
+                       f"lr_{lr}_hidden_{hidden}_i_{i}_valloss_{val_loss_test}"
+            T.save(model.state_dict(),filename)
 
             # Save to variables to plot
             results.loc[len(results)] = [epochs,
@@ -276,7 +287,7 @@ if __name__ == "__main__":
 
   # Save data to plot to file
   training_df = pd.DataFrame(results)
-  training_df.to_csv(header=False)
+  training_df.to_csv("./models/index.csv", header=True)
 
   # 4. Plot graphics for best model.
   # Grahpic 1 - Raw data plot (cases reported by governments)
