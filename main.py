@@ -3,7 +3,6 @@ import pandas as pd
 
 import logging
 from tqdm import tqdm
-import datetime as dt
 import matplotlib.pyplot as plt
 
 from covid19_feature import gen_covid19_feat
@@ -14,7 +13,9 @@ from lockdown_feature import gen_lockdown_feat
 from bordersclosed_feature import gen_borders_feat
 from data import (expand_cases_to_vector,
                   fill_df_column_with_value,
-                  fill_df_column_date_based)
+                  fill_df_column_date_based,
+                  split_by_date,
+                  clean_invalid_data)
 
 import torch as T
 import torch.utils.data as tud
@@ -88,7 +89,7 @@ if __name__ == "__main__":
   parser.add_argument("--hidden", help="Size of the first hidden layer")
   args = parser.parse_args()
 
-  epoch_array = [20, 40, 60, 80, 100, 120]
+  epoch_array = [20, 40, 60, 80]
   epoch_array = arg_val(epoch_array, args.epochs, int)
 
   batch_array = [12, 48]
@@ -193,21 +194,16 @@ if __name__ == "__main__":
   fill_df_column_date_based(data, "Borders", borders_df, 0)
   pbar.update(1)
 
-  # Make a copy to mantain all. In the one that continues, remove dates
-  pbar.set_description("Removing dates after March 16th for training...")
-  # after March 16th
-  datacopy = data.copy(deep=True)
-  #from IPython import embed
-  #embed()
-  mask = [dt.datetime.strptime(date, r"%m/%d/%y") <= \
-          dt.datetime.strptime("03/16/20", r"%m/%d/%y") \
-          for date in data["Date"].values.tolist()]
-  data = data.loc[mask]
+  # Split by date
+  pbar.set_description("Split data up to March, 16th...")
+  limit_date = "03/16/20"
+  bfr, aft = split_by_date(data, limit_date)
   pbar.update(1)
 
-  pbar.set_description("Removing samples with 0 to 0 cases...")
-  mask = (data["NextDay"]==0)
-  data = data.loc[mask]
+  # Clean invalid data
+  pbar.set_description("Removing samples with 0 next day cases...")
+  bfr = clean_invalid_data(bfr)
+  aft = clean_invalid_data(aft)
   pbar.update(1)
 
   pbar.close()
@@ -218,13 +214,13 @@ if __name__ == "__main__":
   logging.info(f"Data setup to feed the model...")
   pbar = tqdm(total=3)
   pbar.set_description("From Pandas.DataFrame to torch.Tensor...")
-  x_cols = (np.arange(len(data.columns)) > 1)
+  x_cols = (np.arange(len(bfr.columns)) > 1)
   x_cols[-1] = False
-  y_cols = np.arange(len(data.columns)) == (len(data.columns) - 1)
+  y_cols = np.arange(len(bfr.columns)) == (len(bfr.columns) - 1)
 
   # Data from Pandas.DataFrame to torch.Tensor
-  x_train_tensor = T.tensor(data.loc[:, x_cols].values.astype(np.float32)).float().to(device)
-  y_train_tensor = T.tensor(data.loc[:, y_cols].values.astype(np.float32)).float().to(device)
+  x_train_tensor = T.tensor(bfr.loc[:, x_cols].values.astype(np.float32)).float().to(device)
+  y_train_tensor = T.tensor(bfr.loc[:, y_cols].values.astype(np.float32)).float().to(device)
   #y_train_tensor = T.from_numpy(y_train).float().to(device)
   pbar.update(1)
 
@@ -246,7 +242,7 @@ if __name__ == "__main__":
   pbar.close()
 
   # 3. Run Training + Test loop. Plot results to compare.
-  logging.info(f"{dt.datetime.now()} - Creating the model...")
+  logging.info("Creating the model...")
 
   results = pd.DataFrame(
     columns = [
@@ -259,7 +255,7 @@ if __name__ == "__main__":
     ]
   )
 
-  logging.info(f"\tTraining")
+  logging.info(f"Training")
   for epochs in epoch_array:
 
     for batch in batch_array:

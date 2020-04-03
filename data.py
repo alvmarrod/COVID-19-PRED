@@ -4,6 +4,8 @@
 import numpy as np
 import pandas as pd
 
+import datetime as dt
+
 def expand_cases_to_vector(data):
   """Receives the cases dataframe and expands it, creating a row per each day
   time lapse.
@@ -46,9 +48,22 @@ def expand_cases_to_vector(data):
                                  0, 0, 0, 0, 0, 
                                  country_data[i+1]]
 
-  # print(f"Temp: {output}")
-
   return output
+
+def split_by_date(df, limit_date):
+  """Splits the dataframe in two new dataframes based on the
+  specified limit date in format mm/dd/yy
+  """
+
+  mask = [dt.datetime.strptime(date, r"%m/%d/%y") <= \
+          dt.datetime.strptime(limit_date, r"%m/%d/%y") \
+          for date in df["Date"].values.tolist()]
+  inverse = [not item for item in mask]
+
+  before = df.loc[mask]
+  after = df.loc[inverse]
+
+  return before, after
 
 def fill_df_column_with_value(df, colname, source_df, source_col, default):
   """Takes the specified column from the source dataframe and inserts its data
@@ -107,3 +122,14 @@ def fill_df_column_date_based(df, colname, source_df, default):
     else:
 
       df.loc[ df["Country"] == country, colname ] = default
+
+def clean_invalid_data(df):
+  """Removes those samples in the dataframe where current and next day cases
+  are 0
+  """
+  
+  # Removing samples with 0 to 0 cases
+  mask = (df["NextDay"]==0)
+  df = df.loc[mask]
+
+  return df
