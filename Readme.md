@@ -35,6 +35,7 @@ To know how raw data has been processed into features, please refer to the [Medi
 * [Matplotlib](https://github.com/matplotlib/matplotlib)
 * [PyTorch](https://pytorch.org/get-started/locally/)
 
+* [PyTorch Summary](https://github.com/sksq96/pytorch-summary)
 * [requests](https://github.com/psf/requests)
 * [tqdm](https://github.com/tqdm/tqdm)
 
