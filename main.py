@@ -3,7 +3,6 @@ import pandas as pd
 
 import logging
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 from covid19_feature import gen_covid19_feat
 from poprisk_feature import gen_poprisk_feat
@@ -16,6 +15,8 @@ from data import (expand_cases_to_vector,
                   fill_df_column_date_based,
                   split_by_date,
                   clean_invalid_data)
+
+import classes.plt_handler as plt
 
 import torch as T
 import torch.utils.data as tud
@@ -35,36 +36,6 @@ covid_columns = ["Province/State",
                  "Confirmed", 
                  "Deaths", 
                  "Recovered"]
-
-def draw_data_in_bar(values, labels, title):
-  """Draws as a bar char the specified values and tags it with the 
-  specified labels and title
-  """
-
-  x = np.arange(1, len(values)+1)
-
-  # Draw it
-  plt.bar(x, values)
-  # Put the labels
-  plt.xticks(x, labels, rotation='vertical')
-  # Put the title
-  plt.title(title)
-  # Show it
-  plt.show()
-
-def draw_aggr(df, grp_col, data_col):
-  """Draws the specified agreggated data column from a pandas.datataframe
-  grouped by the specified aggregation column   
-  """
-
-  grouped_data = df.groupby(by=grp_col).sum()
-
-  values = grouped_data[data_col].to_numpy(dtype=int)
-  labels = grouped_data.index.to_numpy(dtype=str)
-
-  title = data_col + " Cases"
-
-  draw_data_in_bar(values, labels, title)
 
 def arg_val(default, override, kind):
   """Return the argument value to use, making sure it is a list
@@ -326,7 +297,7 @@ if __name__ == "__main__":
 
     logging.info(f"Inference")
 
-    infer_dataset = ptm.df_2_dataset(aft, x_cols, y_cols, device)
+    infer_dataset = ptm.df_2_dataset(bfr, x_cols, y_cols, device)
 
     infer_loader = ptm.datagen(dataset=infer_dataset,
                                batch_size=1)
@@ -336,33 +307,23 @@ if __name__ == "__main__":
     model.load_state_dict(T.load("./models/" + args.model))
 
     # Infer
+    # Results are a list of arrays
+    # Each array: [features, y, yhat]
     results = ptm.predict(model, device, data_loader=infer_loader)
 
-  # 4. Plot graphics for best model.
-  # Grahpic 1 - Raw data plot (cases reported by governments)
-  # Graphic 2 - Predicted data from the model, taking as input the official
-  # data reported the each previous day
-  # Graphic 3 - Predicted data from the model, taking as input its own output
-  # from the previous day except for the very first day, that takes as input
-  # the official reports from the previous day
+    # Plot
+    data_2_plot = pd.DataFrame(results, columns=[
+      "Cases",
+      "Popden",
+      "Masks",
+      "Poprisk",
+      "Lockdown",
+      "Borders",
+      "NextDay",
+      "yhat"
+    ])
 
-
-
-  # 1. Get population density values by executing our script
-  # pbar.set_description(desc="Removing unnecesary fields...", refresh=True)
-  ###### location_popden = latest_locations_with_popden()
-  # pbar.update(n=1)
-
-  # Load data from file
-  # df = pd.read_csv(r'.\data\01-22-2020.csv', header='infer')
-
-  # Replace NaN values for 0
-  # for j in range(3,6):
-  #   df[covid_columns[j]].fillna(0, inplace=True)
-
-  # print(df)
-  # from IPython import embed
-  # embed()
-
-  # Draw our data series
-  # draw_aggr(df, covid_columns[1], covid_columns[3])
+    plt.draw_comparison(data_2_plot, "NextDay", "yhat",
+                        title="Prediction and deviation",
+                        plot=True,
+                        output_png=f"./results/{args.model}_test.png")

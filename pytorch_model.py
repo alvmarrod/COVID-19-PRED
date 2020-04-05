@@ -180,21 +180,19 @@ def predict(model, device, data_loader):
   with T.no_grad():
 
     model.eval()
-    x = None
 
-    for x_val,_ in data_loader:
-
-      if x is None:
-
-        from IPython import embed
-        embed()
+    for x_val, y_val in data_loader:
 
       x_val = x_val.to(device)
       yhat = model(x_val)
 
-      logging.info(f"From {x_val} to: {yhat}")
+      # logging.info(f"From {x_val.squeeze().tolist()} to: {yhat.squeeze().tolist()}")
 
-      out = x_val.squeeze().tolist() + yhat.squeeze().tolist()
+      #from IPython import embed
+      #embed()
+
+      out = x_val.squeeze().tolist() + [y_val.squeeze().tolist(),
+                                        yhat.squeeze().tolist()]
       results.append(out)
 
   return results

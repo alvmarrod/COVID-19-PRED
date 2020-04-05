@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# ----------------FEATURES SECTION ----------------
+
+# -----------------------------------------------------------
 def _sort_cluster_arrays(arrays):
   """Calculates for the given array which is their natural order:
   minimum values < ... < maxium values
@@ -24,6 +27,7 @@ def _sort_cluster_arrays(arrays):
 
   return output
 
+# -----------------------------------------------------------
 def _sort_cluster_dict(dictionary):
   """Calculates for the given dictionary which is their natural order:
   minimum values < ... < maxium values
@@ -62,6 +66,7 @@ def _sort_cluster_dict(dictionary):
 
   return output
 
+# -----------------------------------------------------------
 def _calculate_frontiers(clusters):
   """Calculates the frontiers between the clusters
 
@@ -154,3 +159,76 @@ def plot_clustering(clusters_received,
   fig.savefig(output_png)
 
   return [frontier_1, frontier_2]
+
+# ----------------RESULTS SECTION ----------------
+
+# -----------------------------------------------------------
+def _draw_data_in_bar(values, labels, title):
+  """Draws as a bar char the specified values and tags it with the 
+  specified labels and title
+  """
+
+  x = np.arange(1, len(values)+1)
+
+  # Draw it
+  plt.bar(x, values)
+  # Put the labels
+  plt.xticks(x, labels, rotation='vertical')
+  # Put the title
+  plt.title(title)
+  # Show it
+  plt.show()
+
+# -----------------------------------------------------------
+def draw_aggr(df, grp_col, data_col):
+  """Draws the specified agreggated data column from a pandas.datataframe
+  grouped by the specified aggregation column   
+  """
+
+  grouped_data = df.groupby(by=grp_col).sum()
+
+  values = grouped_data[data_col].to_numpy(dtype=int)
+  labels = grouped_data.index.to_numpy(dtype=str)
+
+  title = data_col + " Cases"
+
+  _draw_data_in_bar(values, labels, title)
+
+# -----------------------------------------------------------
+def draw_comparison(df, actual_col, pred_col, 
+                    title="Comparison",
+                    plot=False,
+                    output_png="./results/test.png"):
+  """Draws to compare the actual data vs the predicted data.
+  """
+
+  g_truth = df[actual_col].to_numpy(dtype=int)
+  predict = df[pred_col].to_numpy(dtype=int)
+
+  x = np.arange(0, len(g_truth))
+
+  # Draw it
+
+  plt.rcParams['legend.numpoints'] = 1
+  fig, ax = plt.subplots(figsize=(6,4))
+
+  for i in range(len(g_truth)):
+    ax.plot([i,i],[predict[i], g_truth[i]], c="k", linewidth=0.5)
+
+  ax.scatter(x, g_truth, color="green", marker="o", label="Ground Truth")
+  ax.scatter(x, predict, color="red", marker="^", label="Prediction")
+
+  # Put the labels
+  # plt.xticks(x, labels, rotation='vertical')
+
+  plt.legend()
+  plt.title(title)
+  plt.grid()
+  
+  if os.path.isfile(output_png):
+    os.remove(output_png)
+
+  fig.savefig(output_png)
+
+  if plot:
+    plt.show()
