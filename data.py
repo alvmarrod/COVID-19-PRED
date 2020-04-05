@@ -129,7 +129,7 @@ def clean_invalid_data(df):
   """
   
   # Removing samples with 0 to 0 cases
-  mask = (df["NextDay"]==0)
+  mask = (df["NextDay"]!=0)
   df = df.loc[mask]
 
   return df
