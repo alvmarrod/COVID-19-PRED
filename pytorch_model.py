@@ -4,11 +4,11 @@ and predict our use case.
 
 import torch as T
 import torch.utils.data as tud
-# import torch.nn.functional as F
 
 import numpy as np
 import pandas as pd
 
+import logging
 from tqdm import tqdm
 
 # -----------------------------------------------------------
@@ -22,12 +22,12 @@ class Net(T.nn.Module):
 
     # 1. Fully connected layer
     self.fc1 = T.nn.Linear(input_size, hidden_size)
-    self.relu1 = T.nn.ReLU()
+    self.relu1 = T.nn.LeakyReLU()
     
     # 2. Fully connect layer
-    hl2_size = int(hidden_size / 2)
+    hl2_size = int(hidden_size*2+1)
     self.fc2 = T.nn.Linear(hidden_size, hl2_size)
-    self.relu2 = T.nn.ReLU()
+    self.relu2 = T.nn.LeakyReLU()
 
     # 3. Output layer
     self.fc3 = T.nn.Linear(hl2_size, 1)
@@ -75,7 +75,7 @@ def make_train_step(model, loss_fn, optimizer):
     yhat = model(x)
 
     # Computes loss
-    loss = loss_fn(y, yhat)
+    loss = loss_fn(yhat, y)
 
     # Computes gradients
     loss.backward()
@@ -114,7 +114,7 @@ def train(model, train_loader, eval_loader, device,
       # Move to correct device, maybe not needed
       x_batch = x_batch.to(device)
       y_batch = y_batch.to(device)
-
+      
       loss = train_step(x_batch, y_batch)
       losses.append(loss)
 
@@ -156,13 +156,13 @@ def test(model, device, data_loader=None):
   # Evaluation
   with T.no_grad():
 
+    model.eval()
+
     for x_val, y_val in data_loader:
 
       x_val = x_val.to(device)
       y_val = y_val.to(device)
-
-      model.eval()
-
+      
       yhat = model(x_val)
       val_loss = lf_instance(y_val, yhat)
       val_losses.append(val_loss.item())
@@ -170,35 +170,82 @@ def test(model, device, data_loader=None):
   return (sum(val_losses) / len(val_losses))
 
 # -----------------------------------------------------------
-def predict(net, input):
-  """Takes the provided input and model, and returns a prediction
+def predict(model, device, data_loader):
+  """Takes the provided input and model, and returns predictions
+  as a python array.
   """
   
-  unk = np.array([[6.1, 3.1, 5.1, 1.1]], dtype=np.float32)
-  unk = T.tensor(unk)  # to Tensor
-  logits = net(unk)  # values do not sum to 1.0
-  probs_t = T.softmax(logits, dim=1)  # as Tensor
-  probs = probs_t.detach().numpy()    # to numpy array
-  
-  print("\nSetting inputs to:")
-  for x in unk[0]:
-    print("%0.1f " % x, end="")
+  results = []
 
-  print("\nPredicted: (setosa, versicolor, virginica)")
+  with T.no_grad():
 
-  for p in probs[0]:
-    print("%0.4f " % p, end="")
+    model.eval()
+    x = None
 
-  print("\n\nEnd Iris demo")
+    for x_val,_ in data_loader:
+
+      if x is None:
+
+        from IPython import embed
+        embed()
+
+      x_val = x_val.to(device)
+      yhat = model(x_val)
+
+      logging.info(f"From {x_val} to: {yhat}")
+
+      out = x_val.squeeze().tolist() + yhat.squeeze().tolist()
+      results.append(out)
+
+  return results
 
 # -----------------------------------------------------------
-def datagen(dataset, batch, shuffle=True):
+def datagen(dataset, batch_size, shuffle=True):
   """Takes the provided input and model, and returns a prediction
   """
   
   loader = T.utils.data.DataLoader(dataset=dataset, 
-                                   batch_size=batch,
+                                   batch_size=batch_size,
                                    shuffle=shuffle)
 
   return loader
 
+# -----------------------------------------------------------
+def df_2_dataset(df, x_cols, y_cols, device):
+  """Takes the provided dataframe as input and returns datasets ready
+  to be used as input for a dataloader later on.
+
+  Arguments
+  ---
+  df: the dataframe to be used
+  cols_x: a mask (bool) array with the columns to be used from the df
+  cols_y: a mask (bool) array with the columns to be used as features
+  device: device where the data should be
+  """
+  
+  # Pass specified cols to tensors
+  x_tensor = T.tensor(df.loc[:, x_cols].values.astype(np.float32)).float().to(device)
+
+  if y_cols is not None:
+    y_tensor = T.tensor(df.loc[:, y_cols].values.astype(np.float32)).float().to(device)
+    dataset = tud.TensorDataset(x_tensor, y_tensor)
+  else:
+    dataset = tud.TensorDataset(x_tensor)
+
+  return dataset
+
+# -----------------------------------------------------------
+def split_dataset(dataset, train_per, val_per):
+  """Takes the provided dataset as input, and returns it splitted in
+  two taking into account the percentages for training and validation.
+
+  Percentages should be expressed in the 0 to 1 range, e.g. 0.9 for 90%
+  """
+  
+  train_per = round(len(dataset) * train_per)
+  val_per = round(len(dataset) * val_per)
+
+  train_dataset, val_dataset = tud.dataset.random_split(dataset, 
+                                                        [train_per, val_per])
+
+  return train_dataset, val_dataset
