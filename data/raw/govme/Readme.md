@@ -137,22 +137,7 @@ It is hard to classify where all the information has been found, so let us expla
 123. [Paraguay](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Paraguay)
 124. [Liechtenstein](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Liechtenstein)
 125. [Guyana](https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Guyana)
-126. 
-127. 
-128. 
-129. 
-
-
-
-
-
-
-
-
-## Sources nº 2 - 
-
-1. ...
 
 ## Thanks to
 
-Here we have to thanks to [Pablo G.](), whose effort in collecting all this data made it possible for the project to happen.
+Here we have to thank [Pablo G.](), whose effort in collecting all this data made it possible for the project to happen, and [Ricardo V.]() for formatting this information
