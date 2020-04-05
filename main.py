@@ -19,8 +19,10 @@ from data import (expand_cases_to_vector,
 
 import torch as T
 import torch.utils.data as tud
+from torchsummary import summary
 import pytorch_model as ptm
 
+import os
 import argparse
 
 log_format="%(asctime)s - %(message)s"
@@ -83,24 +85,41 @@ if __name__ == "__main__":
   ]
   descstr = "".join(desc)
   parser = argparse.ArgumentParser(description=descstr)
+  parser.add_argument("--exec", help="Execute only train/infer")
+  parser.add_argument("--model", help="Model name for inference")
   parser.add_argument("--epochs", help="Number of epochs")
   parser.add_argument("--batch", help="Batch size")
   parser.add_argument("--lr", help="Static learning rate")
   parser.add_argument("--hidden", help="Size of the first hidden layer")
   args = parser.parse_args()
 
-  epoch_array = [20, 40, 60, 80]
+  epoch_array = [50, 100, 150, 200]
   epoch_array = arg_val(epoch_array, args.epochs, int)
 
-  batch_array = [12, 48]
+  batch_array = [ 1, 8, 12, 48]
   batch_array = arg_val(batch_array, args.batch, int)
 
-  lr_array = [0.001, 0.01, 0.1]
+  lr_array = [0.00001, 0.0001, 0.001]
   lr_array = arg_val(lr_array, args.lr, float)
 
-  hidden_array = [6, 8, 10, 12]
+  hidden_array = [3, 4, 5, 6, 7, 8, 9]
   hidden_array = arg_val(hidden_array, args.hidden, int)
 
+  train = True if args.exec is None else True if "train" in args.exec else False
+  infer = True if args.exec is None else True if "infer" in args.exec else False
+
+  if infer:
+    if args.model is None:
+      logging.error("No model has been defined to infer")
+      exit()
+    else:
+      if not os.path.isfile("./models/" + args.model):
+        logging.error("The model file can't be found")
+        exit()
+
+    if args.hidden is None:
+      logging.error("No model size has been defined")
+      exit()
   # 0. Generate features
 
   # COVID-19
@@ -205,45 +224,24 @@ if __name__ == "__main__":
   bfr = clean_invalid_data(bfr)
   aft = clean_invalid_data(aft)
   pbar.update(1)
-
   pbar.close()
 
   # 2. Split in training data, test and prediction data
   device = 'cuda' if T.cuda.is_available() else 'cpu'
 
   logging.info(f"Data setup to feed the model...")
-  pbar = tqdm(total=3)
-  pbar.set_description("From Pandas.DataFrame to torch.Tensor...")
+  
   x_cols = (np.arange(len(bfr.columns)) > 1)
   x_cols[-1] = False
   y_cols = np.arange(len(bfr.columns)) == (len(bfr.columns) - 1)
 
-  # Data from Pandas.DataFrame to torch.Tensor
-  x_train_tensor = T.tensor(bfr.loc[:, x_cols].values.astype(np.float32)).float().to(device)
-  y_train_tensor = T.tensor(bfr.loc[:, y_cols].values.astype(np.float32)).float().to(device)
-  #y_train_tensor = T.from_numpy(y_train).float().to(device)
-  pbar.update(1)
-
-  # From torch.Tensor to torch.Dataset
-  pbar.set_description("From torch.Tensor to torch.Dataset...")
-  dataset = tud.TensorDataset(x_train_tensor, y_train_tensor)
-  pbar.update(1)
+  dataset = ptm.df_2_dataset(bfr, x_cols, y_cols, device)
 
   # Split dataset into training and validate parts
-  pbar.set_description("Split dataset into training / validate...")
-  train_per = round(len(dataset) * 0.9)
-  logging.info(f"Training samples: {train_per}")
-  val_per = round(len(dataset) * 0.1)
-  logging.info(f"Validation samples: {val_per}")
-  epochs = 80
-  train_dataset, val_dataset = tud.dataset.random_split(dataset, 
-                                                        [train_per, val_per])
-  pbar.update(1)
-  pbar.close()
+  logging.info("Split dataset into training / validate...")
+  train_dataset, val_dataset = ptm.split_dataset(dataset, 0.9, 0.1)
 
   # 3. Run Training + Test loop. Plot results to compare.
-  logging.info("Creating the model...")
-
   results = pd.DataFrame(
     columns = [
       "Epochs",
@@ -255,62 +253,90 @@ if __name__ == "__main__":
     ]
   )
 
-  logging.info(f"Training")
-  for epochs in epoch_array:
+  # This will be overrided later, it's just to check how it is generated
+  model = ptm.Net(input_size=6,
+                  hidden_size=hidden_array[0]).to(device)
 
-    for batch in batch_array:
+  summary(model, input_size=(0, 1, 6))
 
-      # From torch.Dataset to torch.DataLoader
-      train_loader = tud.DataLoader(dataset=train_dataset,
-                                    batch_size=batch)
+  if train:
 
-      val_loader = tud.DataLoader(dataset=val_dataset,
-                                  batch_size=batch)
+    logging.info(f"Training")
+    for epochs in epoch_array:
 
-      for lr in lr_array:
+      for batch in batch_array:
 
-        for hidden in hidden_array:
+        # From torch.Dataset to torch.DataLoader
+        train_loader = ptm.datagen(dataset=train_dataset,
+                                   batch_size=batch)
 
-          logging.info(f"\tEpochs {epochs} - Batch {batch} - Lr {lr} - hidden {hidden}")
+        val_loader = ptm.datagen(dataset=val_dataset,
+                                 batch_size=batch)
 
-          for i in range(0, 3):
+        for lr in lr_array:
 
-            logging.info(f"\tIteration {i+1}")
-            T.manual_seed(i*i)
+          for hidden in hidden_array:
 
-            model = ptm.Net(input_size=6,
-                            hidden_size=hidden).to(device)
+            logging.info(f"\tEpochs {epochs} - Batch {batch} - Lr {lr} - hidden {hidden}")
 
-            # Train it
-            loss, val_loss = ptm.train(model,
-                                      train_loader=train_loader,
-                                      eval_loader=val_loader,
-                                      device=device,
-                                      lr=lr,
-                                      batch=batch,
-                                      epochs=epochs)
+            for i in range(0, 3):
 
-            # Test it
-            val_loss_test = ptm.test(model, device, data_loader=val_loader)
+              logging.info(f"\tIteration {i+1}")
+              T.manual_seed(i*i)
 
-            # Save model
-            logging.info(f"\tTest: {val_loss_test}\n")
+              model = ptm.Net(input_size=6,
+                              hidden_size=hidden).to(device)
 
-            filename = f"./models/model_epochs_{epochs}_batch_{batch}_" + \
-                       f"lr_{lr}_hidden_{hidden}_i_{i}_valloss_{val_loss_test}"
-            T.save(model.state_dict(),filename)
+              # Train it
+              loss, val_loss = ptm.train(model,
+                                        train_loader=train_loader,
+                                        eval_loader=val_loader,
+                                        device=device,
+                                        lr=lr,
+                                        batch=batch,
+                                        epochs=epochs)
 
-            # Save to variables to plot
-            results.loc[len(results)] = [epochs,
-                                         batch,
-                                         lr,
-                                         hidden,
-                                         i,
-                                         val_loss_test]
+              # Test it
+              val_loss_test = ptm.test(model, device, data_loader=val_loader)
 
-  # Save data to plot to file
-  training_df = pd.DataFrame(results)
-  training_df.to_csv("./models/index.csv", header=True)
+              # Save model
+              #logging.info(f"Loss: {loss}\n")
+              #logging.info(f"Val Loss: {val_loss}\n")
+              logging.info(f"Test: {val_loss_test}\n")
+
+              filename = f"./models/model_epochs_{epochs}_batch_{batch}_" + \
+                        f"lr_{lr}_hidden_{hidden}_i_{i}_valloss_{val_loss_test}"
+              T.save(model.state_dict(),filename)
+
+              # Save to variables to plot
+              results.loc[len(results)] = [epochs,
+                                          batch,
+                                          lr,
+                                          hidden,
+                                          i,
+                                          val_loss_test]
+
+            exit()
+
+    # Save data to plot to file
+    training_df = pd.DataFrame(results)
+    training_df.to_csv("./models/index.csv", header=True)
+
+  if infer:
+
+    logging.info(f"Inference")
+
+    infer_dataset = ptm.df_2_dataset(aft, x_cols, y_cols, device)
+
+    infer_loader = ptm.datagen(dataset=infer_dataset,
+                               batch_size=1)
+
+    model = ptm.Net(input_size=6,
+                    hidden_size=int(args.hidden)).to(device)
+    model.load_state_dict(T.load("./models/" + args.model))
+
+    # Infer
+    results = ptm.predict(model, device, data_loader=infer_loader)
 
   # 4. Plot graphics for best model.
   # Grahpic 1 - Raw data plot (cases reported by governments)
