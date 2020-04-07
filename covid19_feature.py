@@ -22,9 +22,11 @@ covid_columns = ["Province/State",
                  "Lat",
                  "Long"]
 
-def _read_covid_raw(folder, type):
+def _read_covid_raw(folder, type, reduce=False):
   """Read the COVID raw data from the CSV specified by the type parameter, and
   returns the feature dataframe ready to use by the model
+
+  Allows to make values multiples of 5 using reduce parameter
   """
 
   # Get CSV raw files
@@ -57,7 +59,10 @@ def _read_covid_raw(folder, type):
   # Make the results to be multiple of 5
   for col in raw_df.columns:
     if np.issubdtype(raw_df[col].dtype, np.number):
-      raw_df[col] = (raw_df[col] / 5).round() * 5
+      if reduce:
+        raw_df[col] = (raw_df[col] / 5).round() * 5
+      else:
+        raw_df[col] = raw_df[col].astype(float)
 
   return raw_df
 
