@@ -112,11 +112,15 @@ def fill_df_column_date_based(df, colname, source_df, default):
       #from IPython import embed
       #embed()
 
+      # Extend
       data = data.tolist() + [data[-1].tolist()] * (lenght_difference+1)
+      # If we have further data than needed, should cut
+      if (lenght_difference+1) < 0:
+        data = data[:(lenght_difference+1)]
       
       # Remove the country name at the beginning
       data = data[1:]
-
+      
       df.loc[ df["Country"] == country, colname ] = data
             
     else:
@@ -131,5 +135,32 @@ def clean_invalid_data(df):
   # Removing samples with 0 to 0 cases
   mask = (df["NextDay"]!=0)
   df = df.loc[mask]
+
+  return df
+
+def normalize_data(df, bias=0):
+  """Normalizes the data from numeric columns in the dataframe. Allows
+  to set a bias to add after normalization.
+
+  Takes into account that Cases and NextDay should be normalized by the
+  same max value.
+  """
+
+  same = ["Cases", "NextDay"]
+  same_max = 0
+  
+  for col in df.columns:
+    if np.issubdtype(df[col].dtype, np.number):
+      if col in same:
+        same_max = max(same_max, df[col].max())
+      else:
+        max_val = df[col].max()
+        df.loc[:, col] = (df.loc[:, col] / max_val) + bias
+
+  # Normalize the cases cols
+  col = same[0]
+  df.loc[:, col] = (df.loc[:, col] / same_max) + bias
+  col = same[1]
+  df.loc[:, col] = (df.loc[:, col] / same_max) + bias
 
   return df

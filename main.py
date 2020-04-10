@@ -14,7 +14,8 @@ from data import (expand_cases_to_vector,
                   fill_df_column_with_value,
                   fill_df_column_date_based,
                   split_by_date,
-                  clean_invalid_data)
+                  clean_invalid_data,
+                  normalize_data)
 
 import classes.plt_handler as plt
 
@@ -67,13 +68,13 @@ if __name__ == "__main__":
   epoch_array = [50, 100, 150, 200]
   epoch_array = arg_val(epoch_array, args.epochs, int)
 
-  batch_array = [ 1, 8, 12, 48]
+  batch_array = [ 8, 12, 48]
   batch_array = arg_val(batch_array, args.batch, int)
 
   lr_array = [0.00001, 0.0001, 0.001]
   lr_array = arg_val(lr_array, args.lr, float)
 
-  hidden_array = [3, 4, 5, 6, 7, 8, 9]
+  hidden_array = [3, 4, 5, 6, 7, 8, 9, 10]
   hidden_array = arg_val(hidden_array, args.hidden, int)
 
   train = True if args.exec is None else True if "train" in args.exec else False
@@ -154,7 +155,7 @@ if __name__ == "__main__":
   # Generate an unique dataset with features | output
   # f1, f2, f3, f4, f5, f6, output
   logging.info(f"Data merge...")
-  pbar = tqdm(total=8)
+  pbar = tqdm(total=9)
 
   pbar.set_description("Expand cases into vector of samples...")
   data = expand_cases_to_vector(confirmed)
@@ -186,7 +187,7 @@ if __name__ == "__main__":
 
   # Split by date
   pbar.set_description("Split data up to March, 16th...")
-  limit_date = "03/16/20"
+  limit_date = "03/31/20"
   bfr, aft = split_by_date(data, limit_date)
   pbar.update(1)
 
@@ -194,6 +195,12 @@ if __name__ == "__main__":
   pbar.set_description("Removing samples with 0 next day cases...")
   bfr = clean_invalid_data(bfr)
   aft = clean_invalid_data(aft)
+  pbar.update(1)
+
+  #Normalize
+  pbar.set_description("Normalize data before training...")
+  bfr = normalize_data(bfr)
+  aft = normalize_data(aft)
   pbar.update(1)
   pbar.close()
 
@@ -287,7 +294,7 @@ if __name__ == "__main__":
                                           i,
                                           val_loss_test]
 
-            exit()
+            # exit()
 
     # Save data to plot to file
     training_df = pd.DataFrame(results)
@@ -326,4 +333,5 @@ if __name__ == "__main__":
     plt.draw_comparison(data_2_plot, "NextDay", "yhat",
                         title="Prediction and deviation",
                         plot=True,
-                        output_png=f"./results/{args.model}_test.png")
+                        output_png=f"./results/{args.model}_test.png",
+                        figsize=(21.9, 17.8))
