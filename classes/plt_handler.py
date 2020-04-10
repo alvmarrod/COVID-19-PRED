@@ -197,8 +197,9 @@ def draw_aggr(df, grp_col, data_col):
 # -----------------------------------------------------------
 def draw_comparison(df, actual_col, pred_col, 
                     title="Comparison",
+                    output_png="./results/test.png",
                     plot=False,
-                    output_png="./results/test.png"):
+                    figsize=(6.4, 4.8)):
   """Draws to compare the actual data vs the predicted data.
   """
 
@@ -210,7 +211,7 @@ def draw_comparison(df, actual_col, pred_col,
   # Draw it
 
   plt.rcParams['legend.numpoints'] = 1
-  fig, ax = plt.subplots(figsize=(6,4))
+  fig, ax = plt.subplots(figsize=figsize, dpi=300)
 
   for i in range(len(g_truth)):
     ax.plot([i,i],[predict[i], g_truth[i]], c="k", linewidth=0.5)
