@@ -11,6 +11,8 @@ from sklearn.cluster import KMeans
 from classes.plt_handler import plot_clustering
 from classes.csv_handler import (df_to_csv, read_csv_as_df)
 
+COL_WR = "Weighted Risk"
+
 def _apply_classification(poprisk_df, K=3):
   """Applies K-Means to the population risk dataframe that is passed and
   returns a dictionary with the clusters.
@@ -19,11 +21,10 @@ def _apply_classification(poprisk_df, K=3):
   """
 
   # Convert the dataframe to an array
-  col = "Weighted Risk"
-  poprisk_Array = poprisk_df[col].to_numpy(dtype=float)
+  poprisk_array = poprisk_df[COL_WR].to_numpy(dtype=float)
 
   data_2_feed = []
-  for k in poprisk_Array:
+  for k in poprisk_array:
     data_2_feed.append([k, 0])
 
   # Apply K-Means
@@ -47,8 +48,7 @@ def gen_poprisk_feat(input_raw,
   poprisk_raw_df = read_csv_as_df(input_raw)
 
   # Convert the dataframe to an array
-  col = "Weighted Risk"
-  poprisk_raw_df[col].replace(0, 0.5, inplace=True)
+  poprisk_raw_df[COL_WR].replace(0, 0.5, inplace=True)
 
   clusters = _apply_classification(poprisk_raw_df, K=3)
 
