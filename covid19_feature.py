@@ -69,31 +69,35 @@ def _read_covid_raw(folder, type, reduce=False):
 def gen_covid19_feat(covid19_dr_url,
                      covid19_raw_url,
                      input_raw="./data/raw/covid/",
-                     output_folder="./data/features/covid"):
+                     output_folder="./data/features/covid",
+                     avoid_dwld=False):
   """This function receives the URL from the repository where CSV with the
   time series reports of the COVID-19 are stored. Then it downloads them all
   into the specified as RAW folder, and creates their respective CSV in the
   features folder but with all data grouped by country.
+
+  It allows to don't download new files if exists already and configured to
+  do so. This will avoid us messing with normalization the input later.
   """
 
   # 1. Get the files and save them to Raw data folder
+  if not avoid_dwld:
+    # Get file names in the repo
+    covid_files_list = get_files_from_github_folder(covid19_dr_url)
 
-  # Get file names in the repo
-  covid_files_list = get_files_from_github_folder(covid19_dr_url)
+    # Prepare URLs to download
+    covid_url_list = [[input_raw + "/" + file + ".csv", 
+                      covid19_raw_url + "/" + file + ".csv"] 
+                      for file in covid_files_list]
 
-  # Prepare URLs to download
-  covid_url_list = [[input_raw + "/" + file + ".csv", 
-                    covid19_raw_url + "/" + file + ".csv"] 
-                    for file in covid_files_list]
+    # Download
+    for file in covid_url_list:
+      # If exist, delete the old version so we can have the latest
+      if os.path.isfile(file[0]):
+        os.remove(file[0])
 
-  # Download
-  for file in covid_url_list:
-    # If exist, delete the old version so we can have the latest
-    if os.path.isfile(file[0]):
-      os.remove(file[0])
-
-    # Download it
-    download_as_csv(file[1], file[0])
+      # Download it
+      download_as_csv(file[1], file[0])
 
   # 2. Output the clean output dataframe with only usable data
   types = ['confirmed', 'deaths', 'recovered']

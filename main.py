@@ -107,7 +107,8 @@ if __name__ == "__main__":
   confirmed, deaths, recovered = gen_covid19_feat(covid19_repo_url,
                                                   covid_raw_base_url,
                                                   input_raw=covid19_raw_folder,
-                                                  output_folder=covid19_feat_folder)
+                                                  output_folder=covid19_feat_folder,
+                                                  avoid_dwld=True)
 
   # Population Density
   logging.info(f"Getting Population Density Data...")
