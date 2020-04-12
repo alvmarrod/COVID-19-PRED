@@ -141,7 +141,7 @@ def clean_invalid_data(df):
 
   return df
 
-def normalize_data(df, bias=0):
+def normalize_data(df, norm_cases=True, bias=0):
   """Normalizes the data from numeric columns in the dataframe. Allows
   to set a bias to add after normalization.
 
@@ -161,9 +161,10 @@ def normalize_data(df, bias=0):
         df.loc[:, col] = (df.loc[:, col] / max_val) + bias
 
   # Normalize the cases cols
-  col = same[0]
-  df.loc[:, col] = (df.loc[:, col] / same_max) + bias
-  col = same[1]
-  df.loc[:, col] = (df.loc[:, col] / same_max) + bias
+  if norm_cases:
+    col = same[0]
+    df.loc[:, col] = (df.loc[:, col] / same_max) + bias
+    col = same[1]
+    df.loc[:, col] = (df.loc[:, col] / same_max) + bias
 
   return df
