@@ -8,37 +8,62 @@ import torch.utils.data as tud
 import numpy as np
 import pandas as pd
 
+from collections import OrderedDict
+
 import logging
 from tqdm import tqdm
 
 # -----------------------------------------------------------
-class Net(T.nn.Module):
-  def __init__(self, input_size=6, hidden_size=6):
-    """Constructs our model.
+def define_model(input_size=6, hidden_size=6, model="X/2"):
+  """Constructs our model based on several parameters.
 
-    Input size: 6 features
-    """
-    super(Net, self).__init__()
+  Should refactor.
+  """
 
-    # 1. Fully connected layer
-    self.fc1 = T.nn.Linear(input_size, hidden_size)
-    self.relu1 = T.nn.LeakyReLU()
+  net = None
+  model_layers = OrderedDict()
+
+  # Latest layer to name the output layer afterwards
+  latest = 1
+
+  # Output layer input
+  out_input = 0
+
+  # First hidden layer always equal
+  curr_input = input_size
+  curr_hidden = hidden_size
+  model_layers['fc1'] = T.nn.Linear(curr_input, curr_hidden)
+  model_layers['relu1'] = T.nn.LeakyReLU()
+  latest += 1
+  out_input = curr_hidden
+
+  # The rest is dependent on the model selected
+  curr_input = curr_hidden
+  curr_hidden = int(curr_hidden / 2) if "X/2" == model else \
+                int(curr_hidden*2 + 1) if "X*2+1" == model else \
+                int(curr_hidden*2 + 1) if "X*2+1 | X" == model else 0
+
+  if curr_hidden > 0:
+    model_layers['fc2'] = T.nn.Linear(curr_input, curr_hidden)
+    model_layers['relu2'] = (T.nn.LeakyReLU())
+    latest += 1
+    out_input = curr_hidden
+
+  curr_input = curr_hidden
+  curr_hidden = int(hidden_size) if "X*2+1 | X" == model else 0
+  if curr_hidden > 0:
+    model_layers['fc3'] = T.nn.Linear(curr_input, curr_hidden)
+    model_layers['relu3'] = T.nn.LeakyReLU()
+    latest += 1
+    out_input = curr_hidden
+
+  # Output layer
+  model_layers['fc' + str(latest)] = T.nn.Linear(out_input, 1)
     
-    # 2. Fully connect layer
-    hl2_size = int(hidden_size*2+1)
-    self.fc2 = T.nn.Linear(hidden_size, hl2_size)
-    self.relu2 = T.nn.LeakyReLU()
+  # Construct the sequential mode and return it
+  net = T.nn.Sequential(model_layers)
 
-    # 3. Output layer
-    self.fc3 = T.nn.Linear(hl2_size, 1)
-
-  def forward(self, x):
-    out = self.fc1(x)
-    out = self.relu1(out)
-    out = self.fc2(out)
-    out = self.relu2(out)
-    out = self.fc3(out)
-    return out
+  return net
 
 # -----------------------------------------------------------
 def loss_func(loss):
@@ -221,6 +246,9 @@ def df_2_dataset(df, x_cols, y_cols, device):
   device: device where the data should be
   """
   
+  #from IPython import embed
+  #embed()
+
   # Pass specified cols to tensors
   x_tensor = T.tensor(df.loc[:, x_cols].values.astype(np.float32)).float().to(device)
 

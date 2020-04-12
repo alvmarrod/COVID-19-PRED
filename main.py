@@ -233,8 +233,9 @@ if __name__ == "__main__":
   )
 
   # This will be overrided later, it's just to check how it is generated
-  model = ptm.Net(input_size=6,
-                  hidden_size=hidden_array[0]).to(device)
+  model = ptm.define_model(input_size=6,
+                          hidden_size=hidden_array[0],
+				                  model="X*2+1 | X").to(device)
 
   summary(model, input_size=(0, 1, 6))
 
@@ -263,8 +264,9 @@ if __name__ == "__main__":
               logging.info(f"\tIteration {i+1}")
               T.manual_seed(i*i)
 
-              model = ptm.Net(input_size=6,
-                              hidden_size=hidden).to(device)
+              model = ptm.define_model(input_size=6,
+                                       hidden_size=hidden,
+				                               model="X*2+1 | X").to(device)
 
               # Train it
               loss, val_loss = ptm.train(model,
@@ -310,8 +312,9 @@ if __name__ == "__main__":
     infer_loader = ptm.datagen(dataset=infer_dataset,
                                batch_size=1)
 
-    model = ptm.Net(input_size=6,
-                    hidden_size=int(args.hidden)).to(device)
+    model = ptm.define_model(input_size=6,
+                             hidden_size=int(args.hidden),
+                             model="X*2+1 | X").to(device)
     model.load_state_dict(T.load("./models/" + args.model))
 
     # Infer
