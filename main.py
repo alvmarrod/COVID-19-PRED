@@ -30,14 +30,6 @@ import argparse
 log_format="%(asctime)s - %(message)s"
 logging.basicConfig(level=logging.INFO, format=log_format)
 
-# Column order imposed by the data source of the COVID-19
-covid_columns = ["Province/State", 
-                 "Country/Region", 
-                 "Last Update", 
-                 "Confirmed", 
-                 "Deaths", 
-                 "Recovered"]
-
 def arg_val(default, override, kind):
   """Return the argument value to use, making sure it is a list
   """
@@ -58,6 +50,7 @@ if __name__ == "__main__":
   descstr = "".join(desc)
   parser = argparse.ArgumentParser(description=descstr)
   parser.add_argument("--exec", help="Execute only train/infer")
+  parser.add_argument("--arch", help="Model architecture to use")
   parser.add_argument("--model", help="Model name for inference")
   parser.add_argument("--epochs", help="Number of epochs")
   parser.add_argument("--batch", help="Batch size")
@@ -71,7 +64,7 @@ if __name__ == "__main__":
   batch_array = [ 8, 12, 48]
   batch_array = arg_val(batch_array, args.batch, int)
 
-  lr_array = [0.00001, 0.0001, 0.001]
+  lr_array = [0.00001, 0.000001]
   lr_array = arg_val(lr_array, args.lr, float)
 
   hidden_array = [3, 4, 5, 6, 7, 8, 9, 10]
@@ -235,7 +228,8 @@ if __name__ == "__main__":
   # This will be overrided later, it's just to check how it is generated
   model = ptm.define_model(input_size=6,
                           hidden_size=hidden_array[0],
-				                  model="X*2+1 | X").to(device)
+                          model=args.arch).to(device)
+				                  #model="X*2+1 | X").to(device)
 
   summary(model, input_size=(0, 1, 6))
 
@@ -266,7 +260,8 @@ if __name__ == "__main__":
 
               model = ptm.define_model(input_size=6,
                                        hidden_size=hidden,
-				                               model="X*2+1 | X").to(device)
+                                       model=args.arch).to(device)
+				                               #model="X*2+1 | X").to(device)
 
               # Train it
               loss, val_loss = ptm.train(model,

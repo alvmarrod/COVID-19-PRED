@@ -148,6 +148,9 @@ def normalize_data(df, bias=0):
 
   same = ["Cases", "NextDay"]
   same_max = 0
+
+  # Let's ensure there're not object type columns
+  df = df.infer_objects()
   
   for col in df.columns:
     if np.issubdtype(df[col].dtype, np.number):
