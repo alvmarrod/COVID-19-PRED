@@ -72,7 +72,7 @@ def loss_func(loss):
   func = None
   if ("MAE" in loss) or ("mean absolute error" in loss):
     # We are calculating the mean for each step in the batch/mini_batch/epoch
-    func = T.nn.L1Loss(reduction='mean')
+    func = T.nn.MSELoss(reduction='mean')
 
   return func
 
