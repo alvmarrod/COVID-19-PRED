@@ -72,6 +72,9 @@ def loss_func(loss):
   func = None
   if ("MAE" in loss) or ("mean absolute error" in loss):
     # We are calculating the mean for each step in the batch/mini_batch/epoch
+    func = T.nn.L1Loss(reduction='mean')
+  elif ("MSE" in loss) or ("mean squared error" in loss):
+    # We are calculating the mean for each step in the batch/mini_batch/epoch
     func = T.nn.MSELoss(reduction='mean')
 
   return func
@@ -121,7 +124,7 @@ def train(model, train_loader, eval_loader, device,
   """
 
   # 1. Create the optimizer and loss function
-  lf_instance = loss_func("MAE")
+  lf_instance = loss_func("MSE")
   opt_instance = optimizer("SGD", model, lr=lr)
 
   # 2. Creates the training function
