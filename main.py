@@ -85,6 +85,14 @@ if __name__ == "__main__":
     if args.hidden is None:
       logging.error("No model size has been defined")
       exit()
+
+  # Generate output folders if they doesn't exist
+  if not os.path.exists("./models"):
+    os.mkdir("./models")
+
+  if not os.path.exists("./graphics"):
+    os.mkdir("./graphics")
+
   # 0. Generate features
 
   # COVID-19
