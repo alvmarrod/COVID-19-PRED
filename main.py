@@ -38,6 +38,42 @@ def arg_val(default, override, kind):
   else:
     return [kind(override)]
 
+def pickle_available(pickle_path):
+  """Checks if data used is pickled already
+
+  To-Do: update to check on updates by date from raw data
+  """
+
+  if os.path.exists(pickle_path):
+    return True
+
+
+def save_pickle_data(pickle_file, data):
+  """Saves the provided data in a pickle file. It assumes pandas dataframe
+  as data.
+  """
+
+  try:
+    data.to_pickle(pickle_file)
+
+  except Exception as e:
+    logging.error(f"Wasn't able to save pickled data to {pickle_file}")
+    logging.info(e)
+
+def load_pickle_data(pickle_file):
+  """Loads and return pickled data. It assumes pandas dataframe
+  as data.
+  """
+
+  data = None
+  try:
+    data = pd.read_pickle(pickle_file)
+  except Exception as e:
+    logging.error(f"Wasn't able to load pickled data from {pickle_file}")
+    logging.info(e)
+  
+  return data
+
 if __name__ == "__main__":
 
   # Arguments
@@ -94,117 +130,133 @@ if __name__ == "__main__":
     os.mkdir("./graphics")
 
   # 0. Generate features
+  pickle_path_bfr = "./pickle_cache/dataset_bfr.pickle"
+  pickle_path_aft = "./pickle_cache/dataset_aft.pickle"
+  if not pickle_available(pickle_path_bfr) or \
+     not pickle_available(pickle_path_aft):
 
-  # COVID-19
-  covid19_repo_url = r"https://github.com/CSSEGISandData/COVID-19/tree/master/" + \
-                     r"csse_covid_19_data/csse_covid_19_time_series"
-  covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/" + \
-                       r"COVID-19/master/csse_covid_19_data/csse_covid_19_time_series"
-  covid19_raw_folder = "./data/raw/covid/"
-  covid19_feat_folder = "./data/features/covid/"
+    # COVID-19
+    covid19_repo_url = r"https://github.com/CSSEGISandData/COVID-19/tree/master/" + \
+                      r"csse_covid_19_data/csse_covid_19_time_series"
+    covid_raw_base_url = r"https://raw.githubusercontent.com/CSSEGISandData/" + \
+                        r"COVID-19/master/csse_covid_19_data/csse_covid_19_time_series"
+    covid19_raw_folder = "./data/raw/covid/"
+    covid19_feat_folder = "./data/features/covid/"
 
-  logging.info(f"Starting...")
-  logging.info(f"Getting COVID-19 Cases Data...")
-  confirmed, deaths, recovered = gen_covid19_feat(covid19_repo_url,
-                                                  covid_raw_base_url,
-                                                  input_raw=covid19_raw_folder,
-                                                  output_folder=covid19_feat_folder,
-                                                  avoid_dwld=True)
+    logging.info(f"Starting...")
+    logging.info(f"Getting COVID-19 Cases Data...")
+    confirmed, deaths, recovered = gen_covid19_feat(covid19_repo_url,
+                                                    covid_raw_base_url,
+                                                    input_raw=covid19_raw_folder,
+                                                    output_folder=covid19_feat_folder,
+                                                    avoid_dwld=True)
 
-  # Population Density
-  logging.info(f"Getting Population Density Data...")
-  popden_raw_file = "./data/raw/popden/popden.csv"
-  popden_feat_folder = "./data/features/popden"
-  handicaps = {
-    "Australia": 3
-  }
-  popden_df = gen_popden_feat(popden_raw_file,
-                              output_folder=popden_feat_folder,
-                              handicaps=handicaps,
-                              remove_over=True)
+    # Population Density
+    logging.info(f"Getting Population Density Data...")
+    popden_raw_file = "./data/raw/popden/popden.csv"
+    popden_feat_folder = "./data/features/popden"
+    handicaps = {
+      "Australia": 3
+    }
+    popden_df = gen_popden_feat(popden_raw_file,
+                                output_folder=popden_feat_folder,
+                                handicaps=handicaps,
+                                remove_over=True)
 
-  # Masks Usage
-  logging.info(f"Getting Masks Usage Data...")
-  masks_raw_file = "./data/raw/masks/masks.csv"
-  masks_feat_folder = "./data/features/masks"
-  masks_df = gen_masks_feat(masks_raw_file,
-                            output_folder=masks_feat_folder)
+    # Masks Usage
+    logging.info(f"Getting Masks Usage Data...")
+    masks_raw_file = "./data/raw/masks/masks.csv"
+    masks_feat_folder = "./data/features/masks"
+    masks_df = gen_masks_feat(masks_raw_file,
+                              output_folder=masks_feat_folder)
 
-  # Population Risk
-  logging.info(f"Getting Population Risk Data...")
-  poprisk_raw_file = "./data/raw/poprisk/poprisk.csv"
-  poprisk_feat_folder = "./data/features/poprisk"
-  poprisk_df = gen_poprisk_feat(poprisk_raw_file,
-                                output_folder=poprisk_feat_folder)
+    # Population Risk
+    logging.info(f"Getting Population Risk Data...")
+    poprisk_raw_file = "./data/raw/poprisk/poprisk.csv"
+    poprisk_feat_folder = "./data/features/poprisk"
+    poprisk_df = gen_poprisk_feat(poprisk_raw_file,
+                                  output_folder=poprisk_feat_folder)
 
-  # Gov. Measures 1 - Lockdown
-  logging.info(f"Getting Lockdown Data...")
-  lockdown_raw_file = "./data/raw/govme/lockdown.csv"
-  lockdown_feat_folder = "./data/features/govme"
-  lockdown_df = gen_lockdown_feat(lockdown_raw_file,
-                                  output_folder=lockdown_feat_folder)
+    # Gov. Measures 1 - Lockdown
+    logging.info(f"Getting Lockdown Data...")
+    lockdown_raw_file = "./data/raw/govme/lockdown.csv"
+    lockdown_feat_folder = "./data/features/govme"
+    lockdown_df = gen_lockdown_feat(lockdown_raw_file,
+                                    output_folder=lockdown_feat_folder)
 
-  # Gov. Measures 2 - Borders Closed
-  logging.info(f"Getting Borders Closing Data...")
-  borcls_raw_file = "./data/raw/govme/borders.csv"
-  borcls_feat_folder = "./data/features/govme"
-  borders_df = gen_borders_feat(borcls_raw_file,
-                                output_folder=borcls_feat_folder)
+    # Gov. Measures 2 - Borders Closed
+    logging.info(f"Getting Borders Closing Data...")
+    borcls_raw_file = "./data/raw/govme/borders.csv"
+    borcls_feat_folder = "./data/features/govme"
+    borders_df = gen_borders_feat(borcls_raw_file,
+                                  output_folder=borcls_feat_folder)
 
-  # --------------------------------------------------------
+    # --------------------------------------------------------
 
-  # 1. Prepare the data
-  # Generate an unique dataset with features | output
-  # f1, f2, f3, f4, f5, f6, output
-  logging.info(f"Data merge...")
-  pbar = tqdm(total=9)
+    # 1. Prepare the data
+    # Generate an unique dataset with features | output
+    # f1, f2, f3, f4, f5, f6, output
+    logging.info(f"Data merge...")
+    pbar = tqdm(total=10)
 
-  pbar.set_description("Expand cases into vector of samples...")
-  data = expand_cases_to_vector(confirmed)
-  pbar.update(1)
+    pbar.set_description("Expand cases into vector of samples...")
+    data = expand_cases_to_vector(confirmed)
+    pbar.update(1)
 
-  # We feed 0 as default population density since it's the lowest and it's not
-  # going to be used for training if it doesn't existc
-  pbar.set_description("Fill with Popden feature...")
-  fill_df_column_with_value(data, "Popden", popden_df, "Classification", 1)
-  pbar.update(1)
+    # We feed 0 as default population density since it's the lowest and it's not
+    # going to be used for training if it doesn't existc
+    pbar.set_description("Fill with Popden feature...")
+    fill_df_column_with_value(data, "Popden", popden_df, "Classification", 1)
+    pbar.update(1)
 
-  # 0 Default = No Masks
-  pbar.set_description("Fill with Masks feature...")
-  fill_df_column_with_value(data, "Masks", masks_df, "Mask", 0)
-  pbar.update(1)
+    # 0 Default = No Masks
+    pbar.set_description("Fill with Masks feature...")
+    fill_df_column_with_value(data, "Masks", masks_df, "Mask", 0)
+    pbar.update(1)
 
-  # 1 Default = Lowest Risk
-  pbar.set_description("Fill with Poprisk feature...")
-  fill_df_column_with_value(data, "Poprisk", poprisk_df, "Classification", 1)
-  pbar.update(1)
+    # 1 Default = Lowest Risk
+    pbar.set_description("Fill with Poprisk feature...")
+    fill_df_column_with_value(data, "Poprisk", poprisk_df, "Classification", 1)
+    pbar.update(1)
 
-  # 0 Default = Doesn't apply
-  pbar.set_description("Fill with Lockdown feature...")
-  fill_df_column_date_based(data, "Lockdown", lockdown_df, 0)
-  pbar.update(1)
-  pbar.set_description("Fill with Borders feature...")
-  fill_df_column_date_based(data, "Borders", borders_df, 0)
-  pbar.update(1)
+    # 0 Default = Doesn't apply
+    pbar.set_description("Fill with Lockdown feature...")
+    fill_df_column_date_based(data, "Lockdown", lockdown_df, 0)
+    pbar.update(1)
+    pbar.set_description("Fill with Borders feature...")
+    fill_df_column_date_based(data, "Borders", borders_df, 0)
+    pbar.update(1)
 
-  # Split by date
-  pbar.set_description("Split data up to March, 16th...")
-  limit_date = "03/31/20"
-  bfr, aft = split_by_date(data, limit_date)
-  pbar.update(1)
+    # Split by date
+    pbar.set_description("Split data up to March, 16th...")
+    limit_date = "03/31/20"
+    bfr, aft = split_by_date(data, limit_date)
+    pbar.update(1)
 
-  # Clean invalid data
-  pbar.set_description("Removing samples with 0 next day cases...")
-  bfr = clean_invalid_data(bfr)
-  aft = clean_invalid_data(aft)
-  pbar.update(1)
+    # Clean invalid data
+    pbar.set_description("Removing samples with 0 next day cases...")
+    bfr = clean_invalid_data(bfr)
+    aft = clean_invalid_data(aft)
+    pbar.update(1)
 
-  #Normalize
-  pbar.set_description("Normalize data before training...")
-  bfr = normalize_data(bfr, norm_cases=True)
-  aft = normalize_data(aft, norm_cases=True)
-  pbar.update(1)
-  pbar.close()
+    # Normalize
+    pbar.set_description("Normalize data before training...")
+    bfr = normalize_data(bfr, norm_cases=True)
+    aft = normalize_data(aft, norm_cases=True)
+    pbar.update(1)
+
+    # Save data for next runs
+    pbar.set_description("Saving pickled data...")
+    save_pickle_data(pickle_path_bfr, bfr)
+    save_pickle_data(pickle_path_aft, aft)
+    pbar.update(1)
+    pbar.close()
+
+  else:
+
+    logging.info(f"Loading pickled data...")
+    bfr = load_pickle_data(pickle_path_bfr)
+    aft = load_pickle_data(pickle_path_aft)
 
   # 2. Split in training data, test and prediction data
   device = 'cuda' if T.cuda.is_available() else 'cpu'
