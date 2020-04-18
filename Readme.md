@@ -30,6 +30,10 @@ To know how raw data has been processed into features, please refer to the [Medi
 
 ## Dependencies
 
+Please use the `requirements.txt` file available to install all the these dependencies (except Pytorch, that you should install yourself, please see the link below) using:
+
+`python -m pip install -r requirements.txt`
+
 * [Numpy](https://github.com/numpy/numpy)
 * [Pandas](https://github.com/pandas-dev/pandas)
 * [Matplotlib](https://github.com/matplotlib/matplotlib)

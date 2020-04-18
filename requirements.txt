@@ -1,0 +1,6 @@
+matplotlib
+torchsummary
+tqdm
+requests
+pandas
+numpy
