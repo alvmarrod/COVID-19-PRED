@@ -52,3 +52,10 @@ As you may find out going through the project, I would like to thanks to:
 
 * The review of both the repository readme and the [Medium story](https://medium.com/@alvmarrod/predicting-covid-19-cases-with-machine-learning-454780a3a773).
 * The elaboration of the [Raw Government Measures Readme](./data/raw/govme/Readme.md).
+
+3. [Javier VGD](https://medium.com/@jvgd), who helped us with:
+
+* Reviewing the [Medium story]()
+* Some code challenges or problems.
+
+High five guys!
