@@ -132,8 +132,16 @@ def clean_invalid_data(df):
   are 0
   """
   
-  # Removing samples with 0 to 0 cases
-  mask = (df["NextDay"]!=0)
+  # Removing samples with 0 cases in previous day
+  mask = df["Cases"]!=0
+  df = df.loc[mask]
+
+  # Removing samples with 0 cases next day
+  mask = df["NextDay"]!=0
+  df = df.loc[mask]
+
+  # Removing samples with same amount on both days
+  mask = df["NextDay"] != df["Cases"]
   df = df.loc[mask]
 
   # Let's ensure there're not object type columns
