@@ -13,6 +13,9 @@ from collections import OrderedDict
 import logging
 from tqdm import tqdm
 
+DEBUG_ENABLED = False
+DEBUG_MODE = 0    # 0 = Short, 1 = Long
+
 # -----------------------------------------------------------
 def define_model(input_size=6, hidden_size=6, model="X/2"):
   """Constructs our model based on several parameters.
@@ -174,11 +177,13 @@ def train(model, train_loader, eval_loader, device,
         batches += 1
         val_loss += lf_instance(y_val, yhat).item()
       
-      print(f"Latest validation of epoch {epoch}")
-      print(f"Prediction")
-      print(f"Input: {x_val}")
-      print(f"Expected: {y_val}")
-      print(f"Prediction: {yhat}")
+      if DEBUG_ENABLED:
+        print(f"Latest validation of epoch {epoch}")
+        if DEBUG_MODE:
+          print(f"Prediction")
+          print(f"Input: {x_val}")
+        print(f"Expected: {y_val}")
+        print(f"Prediction: {yhat}")
       val_losses.append(val_loss / batches)
 
     pbar.update(1)
