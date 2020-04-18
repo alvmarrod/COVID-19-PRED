@@ -4,3 +4,4 @@ tqdm
 requests
 pandas
 numpy
+sklearn
