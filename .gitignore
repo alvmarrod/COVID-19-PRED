@@ -1,2 +1,7 @@
 *.pyc
 .vscode
+.\Medium
+.\graphics
+.\models
+.\.ipynb_checkpoints
+.\__pycache__

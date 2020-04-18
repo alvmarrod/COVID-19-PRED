@@ -193,8 +193,8 @@ if __name__ == "__main__":
 
   #Normalize
   pbar.set_description("Normalize data before training...")
-  bfr = normalize_data(bfr)
-  aft = normalize_data(aft)
+  bfr = normalize_data(bfr, norm_cases=True)
+  aft = normalize_data(aft, norm_cases=True)
   pbar.update(1)
   pbar.close()
 
@@ -271,6 +271,15 @@ if __name__ == "__main__":
                                         lr=lr,
                                         batch=batch,
                                         epochs=epochs)
+
+              # Plot
+              filename = f"./graphics/model_epochs_{epochs}_batch_{batch}_" + \
+                        f"lr_{lr}_hidden_{hidden}_i_{i}_losscomparison.png"
+              plt.draw_loss(loss, val_loss,
+                            title="Model training Loss Comparison",
+                            output_png=filename,
+                            plot=False,
+                            figsize=(21.9, 17.8))
 
               # Test it
               val_loss_test = ptm.test(model, device, data_loader=val_loader)

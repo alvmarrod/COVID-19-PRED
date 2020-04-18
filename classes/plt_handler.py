@@ -233,3 +233,35 @@ def draw_comparison(df, actual_col, pred_col,
 
   if plot:
     plt.show()
+
+# -----------------------------------------------------------
+def draw_loss(loss, val_loss, 
+              title="Loss Comparison",
+              output_png="./results/loss_comparison.png",
+              plot=False,
+              figsize=(6.4, 4.8)):
+  """Draws to compare the loss
+  """
+
+  fig = plt.figure(figsize=figsize, dpi=288)
+
+  x = np.arange(0, len(loss))
+
+  plt.plot(x, loss, color="green", marker="o", label="Loss")
+  plt.plot(x, val_loss, color="red", marker="^", label="Val Loss")
+
+  # Put the labels
+  # plt.xticks(x, labels, rotation='vertical')
+
+  plt.legend()
+  plt.title(title)
+  plt.grid()
+  
+  if os.path.isfile(output_png):
+    os.remove(output_png)
+
+  fig.savefig(output_png)
+
+  if plot:
+    # plt.ylim(0, 0.00002)
+    plt.show()

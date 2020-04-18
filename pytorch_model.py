@@ -75,7 +75,7 @@ def loss_func(loss):
     func = T.nn.L1Loss(reduction='mean')
   elif ("MSE" in loss) or ("mean squared error" in loss):
     # We are calculating the mean for each step in the batch/mini_batch/epoch
-    func = T.nn.MSELoss(reduction='mean')
+    func = T.nn.MSELoss()
 
   return func
 
@@ -87,6 +87,8 @@ def optimizer(opt, model, lr=0.01):
   func = None
   if ("SGD" in opt):
     func = T.optim.SGD
+  elif ("Adam" == opt):
+    func = T.optim.Adam
 
   return func(model.parameters(), lr=lr)
 
@@ -136,6 +138,9 @@ def train(model, train_loader, eval_loader, device,
   pbar = tqdm(total=(epochs*2))
   for epoch in range(epochs):
 
+    loss = 0
+    batches = 0
+
     pbar.set_description("Training epoch: %s" % epoch)
     for x_batch, y_batch in train_loader:
 
@@ -143,14 +148,19 @@ def train(model, train_loader, eval_loader, device,
       x_batch = x_batch.to(device)
       y_batch = y_batch.to(device)
       
-      loss = train_step(x_batch, y_batch)
-      losses.append(loss)
+      batches += 1
+      loss += train_step(x_batch, y_batch)
+    
+    losses.append(loss/batches)
 
     pbar.update(1)
     pbar.set_description("Evaluating epoch: %s" % epoch)
 
     # Evaluation side. No gradients required
     with T.no_grad():
+
+      batches = 0
+      val_loss = 0
 
       for x_val, y_val in eval_loader:
 
@@ -160,8 +170,16 @@ def train(model, train_loader, eval_loader, device,
         model.eval()
 
         yhat = model(x_val)
-        val_loss = lf_instance(y_val, yhat)
-        val_losses.append(val_loss.item())
+
+        batches += 1
+        val_loss += lf_instance(y_val, yhat).item()
+      
+      print(f"Latest validation of epoch {epoch}")
+      print(f"Prediction")
+      print(f"Input: {x_val}")
+      print(f"Expected: {y_val}")
+      print(f"Prediction: {yhat}")
+      val_losses.append(val_loss / batches)
 
     pbar.update(1)
 
@@ -178,7 +196,7 @@ def test(model, device, data_loader=None):
     raise Exception("Doesn't exist Data loader for test!")
 
   # 1. Create the loss function
-  lf_instance = loss_func("MAE")
+  lf_instance = loss_func("MSE")
   val_losses = []
 
   # Evaluation
