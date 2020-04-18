@@ -243,7 +243,7 @@ def draw_loss(loss, val_loss,
   """Draws to compare the loss
   """
 
-  fig = plt.figure(figsize=figsize, dpi=288)
+  fig = plt.figure(figsize=figsize, dpi=100)
 
   x = np.arange(0, len(loss))
 
@@ -265,3 +265,5 @@ def draw_loss(loss, val_loss,
   if plot:
     # plt.ylim(0, 0.00002)
     plt.show()
+
+  plt.close(fig)
