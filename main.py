@@ -244,8 +244,8 @@ if __name__ == "__main__":
 
     # Normalize
     pbar.set_description("Normalize data before training...")
-    bfr = normalize_data(bfr, norm_cases=False)
-    aft = normalize_data(aft, norm_cases=False)
+    bfr = normalize_data(bfr, norm_cases=True)
+    aft = normalize_data(aft, norm_cases=True)
     pbar.update(1)
 
     # Save data for next runs
@@ -260,19 +260,6 @@ if __name__ == "__main__":
     logging.info(f"Loading pickled data...")
     bfr = load_pickle_data(pickle_path_bfr)
     aft = load_pickle_data(pickle_path_aft)
-
-  # TEMPORAL FIX
-  # bfr.loc[:, "NextDay"] = bfr.loc[:, "NextDay"] * 100
-  # aft.loc[:, "NextDay"] = aft.loc[:, "NextDay"] * 100
-  bfr.loc[:, "Cases"] = np.log(bfr.loc[:, "Cases"])
-  bfr.loc[:, "NextDay"] = np.log(bfr.loc[:, "NextDay"])
-
-  aft.loc[:, "Cases"] = np.log(aft.loc[:, "Cases"])
-  aft.loc[:, "NextDay"] = np.log(aft.loc[:, "NextDay"])
-
-  #print(bfr.head(5))
-  #print(aft.head(5))
-  #exit()
 
   # 2. Split in training data, test and prediction data
   device = 'cuda' if T.cuda.is_available() else 'cpu'

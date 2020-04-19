@@ -153,8 +153,8 @@ def normalize_data(df, norm_cases=True, bias=0):
   """Normalizes the data from numeric columns in the dataframe. Allows
   to set a bias to add after normalization.
 
-  Takes into account that Cases and NextDay should be normalized by the
-  same max value.
+  Takes into account that Cases and NextDay should be normalized by using
+  log.
   """
 
   same = ["Cases", "NextDay"]
@@ -171,8 +171,8 @@ def normalize_data(df, norm_cases=True, bias=0):
   # Normalize the cases cols
   if norm_cases:
     col = same[0]
-    df.loc[:, col] = (df.loc[:, col] / same_max) + bias
+    df.loc[:, col] = np.log(df.loc[:, col])
     col = same[1]
-    df.loc[:, col] = (df.loc[:, col] / same_max) + bias
+    df.loc[:, col] = np.log(df.loc[:, col])
 
   return df
