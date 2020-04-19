@@ -140,4 +140,4 @@ It is hard to classify where all the information has been found, so let us expla
 
 ## Thanks to
 
-Here we have to thank [Pablo G.](), whose effort in collecting all this data made it possible for the project to happen, and [Ricardo V.]() for formatting this information
+Here we have to thank [Pablo Gomez](), whose effort in collecting all this data made it possible for the project to happen, and [Ricardo Villalobos]() for formatting this information

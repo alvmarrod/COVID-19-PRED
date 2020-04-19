@@ -47,12 +47,12 @@ Please use the `requirements.txt` file available to install all the these depend
 
 As you may find out going through the project, I would like to thanks to:
 
-1. [Pablo G.](), whose effort in collecting needed data made it possible for the project to happen. Specifically:
+1. [Pablo Gomez](), whose effort in collecting needed data made it possible for the project to happen. Specifically:
 
 * The `Weighted Risk` that he has calculated as we specify in the [Medium story](https://medium.com/@alvmarrod/predicting-covid-19-cases-with-machine-learning-454780a3a773), and that is available in [Raw Population Risk Folder](./data/raw/poprisk/).
 * The `Governments Measures` that you can find in [Raw Government Measures Readme](./data/raw/govme/Readme.md)
 
-2. [Ricardo VC](), who helped us with:
+2. [Ricardo Villalobos](), who helped us with:
 
 * The review of both the repository readme and the [Medium story](https://medium.com/@alvmarrod/predicting-covid-19-cases-with-machine-learning-454780a3a773).
 * The elaboration of the [Raw Government Measures Readme](./data/raw/govme/Readme.md).
